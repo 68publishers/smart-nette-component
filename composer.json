@@ -1,0 +1,41 @@
+{
+	"name": "68publishers/smart-nette-component",
+	"description": "Features for Nette Components and Presenters. Authorization via annotations, template resolving and overloading etc. ... ",
+	"keywords": ["68publishers", "nette", "components", "component", "smart-nette-component"],
+	"license": "MIT",
+	"authors": [
+		{
+			"name": "Vojtěch Lacina",
+			"email": "MoraviaD1@gmail.com"
+		},
+		{
+			"name": "Tomáš Glawaty",
+			"email": "tomasglawaty@icloud.com"
+		}
+	],
+	"require": {
+		"php": "~7.1",
+		"nette/di": "~2.4",
+		"nette/utils": "~2.4",
+		"nette/application": "~2.4",
+		"nette/security": "~2.4",
+		"doctrine/annotations": "^1.6"
+	},
+	"require-dev": {
+		"friendsofphp/php-cs-fixer": "^2.0",
+		"nette/tester": "^1.7",
+		"mockery/mockery": "^1.2"
+	},
+	"suggest": {
+		"kdyby/annotations": "You could use this package as Doctrine Annotations provider.",
+		"nettrine/annotations ": "You could use this package as Doctrine Annotations provider."
+	},
+	"autoload": {
+		"classmap": ["src/"],
+		"files": []
+	},
+	"autoload-dev": {
+		"classmap": ["tests/"],
+		"files": []
+	}
+}
