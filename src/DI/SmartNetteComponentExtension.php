@@ -20,6 +20,10 @@ final class SmartNetteComponentExtension extends Nette\DI\CompilerExtension
 		$builder->addDefinition($this->prefix('reader'))
 			->setType(SixtyEightPublishers\SmartNetteComponent\Reader\IAnnotationReader::class)
 			->setFactory(SixtyEightPublishers\SmartNetteComponent\Reader\DoctrineAnnotationReader::class);
+
+		$builder->addDefinition($this->prefix('link_authorizator'))
+			->setType(SixtyEightPublishers\SmartNetteComponent\Link\ILinkAuthorizator::class)
+			->setFactory(SixtyEightPublishers\SmartNetteComponent\Link\LinkAuthorizator::class);
 	}
 
 	/**
