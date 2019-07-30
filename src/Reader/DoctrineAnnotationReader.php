@@ -40,7 +40,7 @@ final class DoctrineAnnotationReader implements IAnnotationReader
 		}, $this->reader->getClassAnnotations($reflectionClass)));
 
 		if ($parent instanceof \ReflectionClass && (NULL === $stopBeforeParent || ($reflectionClass->getName() !== $stopBeforeParent && $parent->getName() !== $stopBeforeParent))) {
-			$result = array_merge($result, $this->composeClassAnnotations($parent, $stopBeforeParent));
+			$result = array_merge($this->composeClassAnnotations($parent, $stopBeforeParent), $result);
 		}
 
 		return $result;
