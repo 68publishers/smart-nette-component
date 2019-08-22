@@ -22,8 +22,11 @@ final class ContainerFactory
 			define('TEMP_PATH', __DIR__ . '/../temp');
 		}
 
-		$loader = new Nette\DI\ContainerLoader(TEMP_PATH . '/cache/Nette.Configurator', TRUE);
-		$class = $loader->load(function (Nette\DI\Compiler $compiler) use ($config): void {
+		$loader = new Nette\DI\ContainerLoader(TEMP_PATH . '/cache/Nette.Configurator/', TRUE);
+		$class = $loader->load(static function (Nette\DI\Compiler $compiler) use ($config): void {
+			$compiler->addExtension('http', new Nette\Bridges\HttpDI\HttpExtension());
+			$compiler->addExtension('session', new Nette\Bridges\HttpDI\SessionExtension());
+			$compiler->addExtension('security', new Nette\Bridges\SecurityDI\SecurityExtension());
 			$compiler->addExtension('smart_nette_component', new SixtyEightPublishers\SmartNetteComponent\DI\SmartNetteComponentExtension());
 
 			if (is_array($config)) {

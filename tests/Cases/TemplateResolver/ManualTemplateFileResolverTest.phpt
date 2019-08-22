@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SixtyEightPublishers\SmartNetteComponent\Tests\Cases;
+namespace SixtyEightPublishers\SmartNetteComponent\Tests\Cases\TemplateResolver;
 
 use Tester;
 use Mockery;

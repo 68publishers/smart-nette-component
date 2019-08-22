@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace SixtyEightPublishers\SmartNetteComponent\Tests\Cases;
+namespace SixtyEightPublishers\SmartNetteComponent\Tests\Cases\Reader;
 
 use Tester;
 use Mockery;
@@ -67,9 +67,9 @@ final class DoctrineAnnotationReaderTest extends Tester\TestCase
 		], $doctrineAnnotationReader->getClassAnnotations($fooReflection));
 
 		Tester\Assert::equal([
-			new SixtyEightPublishers\SmartNetteComponent\Reader\ClassAnnotation($barReflection, $isInRole2),
 			new SixtyEightPublishers\SmartNetteComponent\Reader\ClassAnnotation($fooReflection, $loggedIn),
 			new SixtyEightPublishers\SmartNetteComponent\Reader\ClassAnnotation($fooReflection, $isInRole),
+			new SixtyEightPublishers\SmartNetteComponent\Reader\ClassAnnotation($barReflection, $isInRole2),
 		], $doctrineAnnotationReader->getClassAnnotations($barReflection));
 
 		Tester\Assert::equal([

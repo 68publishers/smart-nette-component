@@ -3,3 +3,5 @@ services:
 		class: Doctrine\Common\Annotations\AnnotationReader
 		setup:
 			- Doctrine\Common\Annotations\AnnotationRegistry::registerUniqueLoader('class_exists')
+
+	dummyService: SixtyEightPublishers\SmartNetteComponent\Tests\Fixture\DummyTranslatableService
