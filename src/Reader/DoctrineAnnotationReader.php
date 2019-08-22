@@ -35,7 +35,7 @@ final class DoctrineAnnotationReader implements IAnnotationReader
 	{
 		$parent = $reflectionClass->getParentClass();
 
-		$result = array_values(array_map(function ($annotation) use ($reflectionClass) {
+		$result = array_values(array_map(static function ($annotation) use ($reflectionClass) {
 			return new ClassAnnotation($reflectionClass, $annotation);
 		}, $this->reader->getClassAnnotations($reflectionClass)));
 

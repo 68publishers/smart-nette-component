@@ -37,7 +37,7 @@ abstract class Presenter extends Nette\Application\UI\Presenter
 	/**
 	 * {@inheritdoc}
 	 */
-	public function formatLayoutTemplateFiles()
+	public function formatLayoutTemplateFiles(): array
 	{
 		return array_merge($this->customLayouts, parent::formatLayoutTemplateFiles());
 	}

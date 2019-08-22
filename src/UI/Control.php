@@ -77,8 +77,7 @@ abstract class Control extends Nette\Application\UI\Control
 	 */
 	private function getTemplateFileResolver(): SmartNetteComponent\TemplateResolver\ManualTemplateFileResolver
 	{
-		return NULL === $this->templateFileResolver
-			? $this->templateFileResolver = SmartNetteComponent\TemplateResolver\TemplateFileResolverFactory::create(static::class, 'templates')
-			: $this->templateFileResolver;
+		return $this->templateFileResolver
+			?? $this->templateFileResolver = SmartNetteComponent\TemplateResolver\TemplateFileResolverFactory::create(static::class, 'templates');
 	}
 }
