@@ -28,7 +28,8 @@
 	},
 	"suggest": {
 		"kdyby/annotations": "You could use this package as Doctrine Annotations provider.",
-		"nettrine/annotations ": "You could use this package as Doctrine Annotations provider."
+		"nettrine/annotations ": "You could use this package as Doctrine Annotations provider.",
+		"kdyby/translation": "If you want to use ITranslatorAware interface for automatic Translator injections into our services."
 	},
 	"autoload": {
 		"classmap": ["src/"],
