@@ -17,8 +17,11 @@ interface ITranslatorAware
 
 	/**
 	 * @return \Nette\Localization\ITranslator
-	 *
-	 * @return void
 	 */
 	public function getTranslator(): Nette\Localization\ITranslator;
+
+	/**
+	 * @return \Nette\Localization\ITranslator
+	 */
+	public function getPrefixedTranslator(): Nette\Localization\ITranslator;
 }
