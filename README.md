@@ -11,7 +11,7 @@ This package adds some useful features for Nette Presenters and Components like:
 The best way to install 68publishers/smart-nette-component is using Composer:
 
 ```bash
-composer require 68publishers/smart-nette-component
+$ composer require 68publishers/smart-nette-component
 ```
 
 then you can register extension into DIC:
@@ -167,11 +167,11 @@ class BarPresenter extends SixtyEightPublishers\SmartNetteComponent\UI\Presenter
 Before committing any changes, don't forget to run
 
 ```bash
-vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v --dry-run
+$ vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v --dry-run
 ```
 
 and
 
 ```bash
-vendor/bin/tester ./tests
+$ vendor/bin/tester ./tests
 ```

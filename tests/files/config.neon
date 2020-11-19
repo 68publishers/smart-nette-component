@@ -1,7 +1,8 @@
+extensions:
+	smart_nette_component: SixtyEightPublishers\SmartNetteComponent\DI\SmartNetteComponentExtension
+
 services:
 	annotationReader:
 		class: Doctrine\Common\Annotations\AnnotationReader
 		setup:
 			- Doctrine\Common\Annotations\AnnotationRegistry::registerUniqueLoader('class_exists')
-
-	dummyService: SixtyEightPublishers\SmartNetteComponent\Tests\Fixture\DummyTranslatableService
