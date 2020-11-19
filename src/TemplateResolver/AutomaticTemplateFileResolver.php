@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\TemplateResolver;
 
-use Nette;
-use SixtyEightPublishers;
+use Nette\SmartObject;
+use Nette\Utils\Strings;
+use SixtyEightPublishers\SmartNetteComponent\Exception\InvalidStateException;
 
-final class AutomaticTemplateFileResolver implements ITemplateFileResolver
+final class AutomaticTemplateFileResolver implements TemplateFileResolverInterface
 {
-	use Nette\SmartObject;
+	use SmartObject;
 
 	/** @var string[]  */
 	private $templateFiles = [];
@@ -42,7 +43,7 @@ final class AutomaticTemplateFileResolver implements ITemplateFileResolver
 	private function setFile(string $file, string $type = ''): void
 	{
 		if (FALSE === file_exists($file)) {
-			throw new Nette\InvalidStateException(sprintf(
+			throw new InvalidStateException(sprintf(
 				'Template file %s for component %s does not exists',
 				$file,
 				$this->metadata->name
@@ -66,7 +67,7 @@ final class AutomaticTemplateFileResolver implements ITemplateFileResolver
 		$typeString = TRUE === empty($type) ? $type : $type . '.';
 		$paths = [
 			sprintf('%s%s%s.latte', $this->metadata->basePath, $typeString, $this->metadata->shortName),
-			sprintf('%s%s%s.latte', $this->metadata->basePath, $typeString, Nette\Utils\Strings::firstLower($this->metadata->shortName)),
+			sprintf('%s%s%s.latte', $this->metadata->basePath, $typeString, Strings::firstLower($this->metadata->shortName)),
 		];
 
 		foreach ($paths as $path) {
@@ -79,7 +80,7 @@ final class AutomaticTemplateFileResolver implements ITemplateFileResolver
 			}
 		}
 
-		throw new SixtyEightPublishers\SmartNetteComponent\Exception\InvalidStateException(sprintf(
+		throw new InvalidStateException(sprintf(
 			'Can not find template file for component %s [type %s]',
 			$this->metadata->name,
 			TRUE === empty($type) ? 'is default (empty)' : "'{$type}'"

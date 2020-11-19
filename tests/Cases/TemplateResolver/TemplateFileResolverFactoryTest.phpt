@@ -4,24 +4,27 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\Tests\Cases\TemplateResolver;
 
-use Tester;
-use SixtyEightPublishers;
+use Tester\Assert;
+use Tester\TestCase;
+use SixtyEightPublishers\SmartNetteComponent\Tests\Fixture\EmptyClass;
+use SixtyEightPublishers\SmartNetteComponent\TemplateResolver\TemplateFileResolverFactory;
+use SixtyEightPublishers\SmartNetteComponent\TemplateResolver\TemplateFileResolverInterface;
 
 require __DIR__ . '/../../bootstrap.php';
 
-final class TemplateFileResolverFactoryTest extends Tester\TestCase
+final class TemplateFileResolverFactoryTest extends TestCase
 {
 	/**
 	 * @return void
 	 */
 	public function testResolverCreating(): void
 	{
-		$resolver = SixtyEightPublishers\SmartNetteComponent\TemplateResolver\TemplateFileResolverFactory::create(
-			SixtyEightPublishers\SmartNetteComponent\Tests\Fixture\EmptyClass::class,
+		$resolver = TemplateFileResolverFactory::create(
+			EmptyClass::class,
 			'templates'
 		);
 
-		Tester\Assert::type(SixtyEightPublishers\SmartNetteComponent\TemplateResolver\ITemplateFileResolver::class, $resolver);
+		Assert::type(TemplateFileResolverInterface::class, $resolver);
 	}
 }
 

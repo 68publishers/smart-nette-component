@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\Reader;
 
-use Nette;
+use ReflectionClass;
+use Nette\SmartObject;
 
 /**
  * @property-read \ReflectionClass $reflectionClass
@@ -12,7 +13,7 @@ use Nette;
  */
 class ClassAnnotation
 {
-	use Nette\SmartObject;
+	use SmartObject;
 
 	/** @var \ReflectionClass  */
 	private $reflectionClass;
@@ -24,7 +25,7 @@ class ClassAnnotation
 	 * @param \ReflectionClass $reflectionClass
 	 * @param object           $annotation
 	 */
-	public function __construct(\ReflectionClass $reflectionClass, $annotation)
+	public function __construct(ReflectionClass $reflectionClass, $annotation)
 	{
 		$this->reflectionClass = $reflectionClass;
 		$this->annotation = $annotation;
@@ -33,7 +34,7 @@ class ClassAnnotation
 	/**
 	 * @return \ReflectionClass
 	 */
-	public function getReflectionClass(): \ReflectionClass
+	public function getReflectionClass(): ReflectionClass
 	{
 		return $this->reflectionClass;
 	}
@@ -41,7 +42,7 @@ class ClassAnnotation
 	/**
 	 * @return object
 	 */
-	public function getAnnotation()
+	public function getAnnotation(): object
 	{
 		return $this->annotation;
 	}

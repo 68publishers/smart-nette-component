@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\Tests\Helper;
 
-use Nette;
+use Nette\Configurator;
+use Nette\DI\Container;
 
 final class ContainerFactory
 {
@@ -13,9 +14,9 @@ final class ContainerFactory
 	 *
 	 * @return \Nette\DI\Container
 	 */
-	public static function createContainer($config = NULL): Nette\DI\Container
+	public static function createContainer($config = NULL): Container
 	{
-		$configurator = new Nette\Configurator();
+		$configurator = new Configurator();
 
 		$configurator->setTempDirectory(TEMP_PATH);
 		$configurator->addConfig(CONFIG_DIR . '/common.neon');

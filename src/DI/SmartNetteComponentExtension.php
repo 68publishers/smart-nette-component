@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\DI;
 
-use Nette;
-use Doctrine;
-use SixtyEightPublishers;
+use Nette\DI\CompilerExtension;
+use Doctrine\Common\Annotations\Reader;
+use SixtyEightPublishers\SmartNetteComponent\Link\LinkAuthorizator;
+use SixtyEightPublishers\SmartNetteComponent\Link\LinkAuthorizatorInterface;
+use SixtyEightPublishers\SmartNetteComponent\Exception\InvalidStateException;
+use SixtyEightPublishers\SmartNetteComponent\Reader\DoctrineAnnotationReader;
+use SixtyEightPublishers\SmartNetteComponent\Reader\AnnotationReaderInterface;
 
-final class SmartNetteComponentExtension extends Nette\DI\CompilerExtension
+final class SmartNetteComponentExtension extends CompilerExtension
 {
 	/**
 	 * {@inheritdoc}
@@ -18,12 +22,12 @@ final class SmartNetteComponentExtension extends Nette\DI\CompilerExtension
 		$builder = $this->getContainerBuilder();
 
 		$builder->addDefinition($this->prefix('reader'))
-			->setType(SixtyEightPublishers\SmartNetteComponent\Reader\IAnnotationReader::class)
-			->setFactory(SixtyEightPublishers\SmartNetteComponent\Reader\DoctrineAnnotationReader::class);
+			->setType(AnnotationReaderInterface::class)
+			->setFactory(DoctrineAnnotationReader::class);
 
 		$builder->addDefinition($this->prefix('link_authorizator'))
-			->setType(SixtyEightPublishers\SmartNetteComponent\Link\ILinkAuthorizator::class)
-			->setFactory(SixtyEightPublishers\SmartNetteComponent\Link\LinkAuthorizator::class);
+			->setType(LinkAuthorizatorInterface::class)
+			->setFactory(LinkAuthorizator::class);
 	}
 
 	/**
@@ -33,10 +37,10 @@ final class SmartNetteComponentExtension extends Nette\DI\CompilerExtension
 	{
 		$builder = $this->getContainerBuilder();
 
-		if (NULL === $builder->getByType(Doctrine\Common\Annotations\Reader::class)) {
-			throw new SixtyEightPublishers\SmartNetteComponent\Exception\InvalidStateException(sprintf(
+		if (NULL === $builder->getByType(Reader::class)) {
+			throw new InvalidStateException(sprintf(
 				'Missing service of type %s. Please register it manually or use one of suggested libraries from composer.json',
-				Doctrine\Common\Annotations\Reader::class
+				Reader::class
 			));
 		}
 	}

@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\UI;
 
-use Nette;
-use SixtyEightPublishers\SmartNetteComponent;
+use Nette\Application\UI\Control as NetteControl;
+use SixtyEightPublishers\SmartNetteComponent\TemplateResolver\ManualTemplateFileResolver;
+use SixtyEightPublishers\SmartNetteComponent\TemplateResolver\TemplateFileResolverFactory;
 
-abstract class Control extends Nette\Application\UI\Control
+abstract class Control extends NetteControl
 {
-	use TAnnotatedControl;
+	use AnnotatedControlTrait;
 
 	/** @var NULL|\SixtyEightPublishers\SmartNetteComponent\TemplateResolver\ManualTemplateFileResolver */
 	private $templateFileResolver;
 
 	/**
 	 * {@inheritdoc}
+	 * @throws \SixtyEightPublishers\SmartNetteComponent\Exception\ForbiddenRequestException
 	 */
 	public function checkRequirements($element): void
 	{
@@ -75,9 +77,9 @@ abstract class Control extends Nette\Application\UI\Control
 	/**
 	 * @return \SixtyEightPublishers\SmartNetteComponent\TemplateResolver\ManualTemplateFileResolver
 	 */
-	private function getTemplateFileResolver(): SmartNetteComponent\TemplateResolver\ManualTemplateFileResolver
+	private function getTemplateFileResolver(): ManualTemplateFileResolver
 	{
 		return $this->templateFileResolver
-			?? $this->templateFileResolver = SmartNetteComponent\TemplateResolver\TemplateFileResolverFactory::create(static::class, 'templates');
+			?? $this->templateFileResolver = TemplateFileResolverFactory::create(static::class, 'templates');
 	}
 }

@@ -65,7 +65,7 @@ class MoreSecuredPresenter extends SixtyEightPublishers\SmartNetteComponent\UI\P
 	 *
 	 * {@inheritdoc}
 	 */
-	protected function onForbiddenRequest(SixtyEightPublishers\SmartNetteComponent\Annotation\IAuthorizationAnnotation $annotation): void
+	protected function onForbiddenRequest(SixtyEightPublishers\SmartNetteComponent\Annotation\AuthorizationAnnotationInterface $annotation): void
 	{
 		$this->flashMessage('...');
 		$this->redirect('...');
@@ -104,7 +104,7 @@ class FooControl extends SixtyEightPublishers\SmartNetteComponent\UI\Control
 	 *
 	 * {@inheritdoc}
 	 */
-	protected function onForbiddenRequest(SixtyEightPublishers\SmartNetteComponent\Annotation\IAuthorizationAnnotation $annotation): void
+	protected function onForbiddenRequest(SixtyEightPublishers\SmartNetteComponent\Annotation\AuthorizationAnnotationInterface $annotation): void
 	{
 		$this->flashMessage('...');
 		$this->presenter->redirect('...');

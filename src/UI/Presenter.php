@@ -4,18 +4,21 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\UI;
 
-use Nette;
-use SixtyEightPublishers\SmartNetteComponent;
+use Nette\Application\UI\Presenter as NettePresenter;
+use SixtyEightPublishers\SmartNetteComponent\Annotation\Layout;
+use SixtyEightPublishers\SmartNetteComponent\Reader\ClassAnnotation;
+use SixtyEightPublishers\SmartNetteComponent\Annotation\AuthorizationAnnotationInterface;
 
-abstract class Presenter extends Nette\Application\UI\Presenter
+abstract class Presenter extends NettePresenter
 {
-	use TAnnotatedControl;
+	use AnnotatedControlTrait;
 
 	/** @var string[] */
 	private $customLayouts = [];
 
 	/**
 	 * {@inheritdoc}
+	 * @throws \Nette\Application\ForbiddenRequestException
 	 */
 	public function checkRequirements($element): void
 	{
@@ -49,15 +52,15 @@ abstract class Presenter extends Nette\Application\UI\Presenter
 	 *
 	 * @throws \SixtyEightPublishers\SmartNetteComponent\Exception\ForbiddenRequestException
 	 */
-	protected function processClassAnnotation(SmartNetteComponent\Reader\ClassAnnotation $classAnnotation): void
+	protected function processClassAnnotation(ClassAnnotation $classAnnotation): void
 	{
 		$annotation = $classAnnotation->getAnnotation();
 
-		if ($annotation instanceof SmartNetteComponent\Annotation\IAuthorizationAnnotation) {
+		if ($annotation instanceof AuthorizationAnnotationInterface) {
 			$this->checkAuthorizationAnnotation($annotation);
 		}
 
-		if ($annotation instanceof SmartNetteComponent\Annotation\Layout) {
+		if ($annotation instanceof Layout) {
 			$this->customLayouts[] = dirname($classAnnotation->getReflectionClass()->getFileName()) . '/' . $annotation->path;
 		}
 	}

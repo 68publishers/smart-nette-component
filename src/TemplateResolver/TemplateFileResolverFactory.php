@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\TemplateResolver;
 
-use Nette;
+use ReflectionClass;
+use Nette\StaticClass;
 
 final class TemplateFileResolverFactory
 {
-	use Nette\StaticClass;
+	use StaticClass;
 
 	/** @var array  */
 	private static $automaticCache = [];
@@ -31,11 +32,13 @@ final class TemplateFileResolverFactory
 	 * @param string $path
 	 *
 	 * @return \SixtyEightPublishers\SmartNetteComponent\TemplateResolver\AutomaticTemplateFileResolver
+	 * @noinspection PhpDocMissingThrowsInspection
+	 * @noinspection PhpUnhandledExceptionInspection
 	 */
 	private static function getAutomaticResolver(string $className, string $path): AutomaticTemplateFileResolver
 	{
 		if (!array_key_exists($key = md5($className . '=' . $path), self::$automaticCache)) {
-			$reflection = new \ReflectionClass($className);
+			$reflection = new ReflectionClass($className);
 
 			self::$automaticCache[$key] = new AutomaticTemplateFileResolver(new Metadata(
 				$reflection->getName(),

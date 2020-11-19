@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\Annotation;
 
-use Nette;
+use Nette\Security\User;
 
-interface IAuthorizationAnnotation
+interface AuthorizationAnnotationInterface
 {
 	/**
 	 * @param \Nette\Security\User $user
 	 *
 	 * @return bool
 	 */
-	public function isAllowed(Nette\Security\User $user): bool;
+	public function isAllowed(User $user): bool;
 }

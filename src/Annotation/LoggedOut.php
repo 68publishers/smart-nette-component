@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\Annotation;
 
-use Nette;
+use Nette\Security\User;
 
 /**
  * @Annotation
  * @Target({"CLASS", "METHOD"})
  */
-final class LoggedOut implements IAuthorizationAnnotation
+final class LoggedOut implements AuthorizationAnnotationInterface
 {
 	/******************** interface \SixtyEightPublishers\SmartNetteComponent\Annotation\IAuthorizationAnnotation ********************/
 
 	/**
 	 * {@inheritdoc}
 	 */
-	public function isAllowed(Nette\Security\User $user): bool
+	public function isAllowed(User $user): bool
 	{
 		return FALSE === $user->isLoggedIn();
 	}
