@@ -7,5 +7,12 @@ if (@!include __DIR__ . '/../vendor/autoload.php') {
 	exit(1);
 }
 
-\Tester\Environment::setup();
-date_default_timezone_set('Europe/Prague');
+Tester\Environment::setup();
+
+if (!defined('TEMP_PATH')) {
+	define('TEMP_PATH', __DIR__ . '/temp');
+}
+
+if (!defined('CONFIG_DIR')) {
+	define('CONFIG_DIR', __DIR__ . '/files');
+}

@@ -1,8 +1,0 @@
-services:
-	annotationReader:
-		class: Doctrine\Common\Annotations\AnnotationReader
-		setup:
-			- Doctrine\Common\Annotations\AnnotationRegistry::registerUniqueLoader('class_exists')
-
-	translator: SixtyEightPublishers\SmartNetteComponent\Tests\Fixture\DummyTranslator
-	dummyService: SixtyEightPublishers\SmartNetteComponent\Tests\Fixture\DummyTranslatableService
