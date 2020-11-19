@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\Tests\Cases\TemplateResolver;
 
-use Tester;
 use Mockery;
-use SixtyEightPublishers;
+use Tester\Assert;
+use Tester\TestCase;
+use SixtyEightPublishers\SmartNetteComponent\Tests\Fixture\EmptyClass;
+use SixtyEightPublishers\SmartNetteComponent\TemplateResolver\Metadata;
+use SixtyEightPublishers\SmartNetteComponent\Exception\InvalidStateException;
+use SixtyEightPublishers\SmartNetteComponent\TemplateResolver\ManualTemplateFileResolver;
+use SixtyEightPublishers\SmartNetteComponent\TemplateResolver\TemplateFileResolverInterface;
 
 require __DIR__ . '/../../bootstrap.php';
 
-final class ManualTemplateFileResolverTest extends Tester\TestCase
+final class ManualTemplateFileResolverTest extends TestCase
 {
 	/** @var \SixtyEightPublishers\SmartNetteComponent\TemplateResolver\ManualTemplateFileResolver */
 	private $resolver;
@@ -22,16 +27,16 @@ final class ManualTemplateFileResolverTest extends Tester\TestCase
 	{
 		parent::setUp();
 
-		$fallbackResolver = Mockery::mock(SixtyEightPublishers\SmartNetteComponent\TemplateResolver\ITemplateFileResolver::class);
+		$fallbackResolver = Mockery::mock(TemplateFileResolverInterface::class);
 		$fallbackResolver->shouldReceive('resolve')->with('foo')->andReturn('FALLBACK_FOO');
 
-		$metadata = new SixtyEightPublishers\SmartNetteComponent\TemplateResolver\Metadata(
-			SixtyEightPublishers\SmartNetteComponent\Tests\Fixture\EmptyClass::class,
+		$metadata = new Metadata(
+			EmptyClass::class,
 			'EmptyClass',
 			__DIR__ . '/../../Fixture'
 		);
 
-		$this->resolver = new SixtyEightPublishers\SmartNetteComponent\TemplateResolver\ManualTemplateFileResolver(
+		$this->resolver = new ManualTemplateFileResolver(
 			$fallbackResolver,
 			$metadata
 		);
@@ -52,7 +57,7 @@ final class ManualTemplateFileResolverTest extends Tester\TestCase
 	 */
 	public function testSetValidTemplateFile(): void
 	{
-		Tester\Assert::noError(function () {
+		Assert::noError(function () {
 			$this->resolver->setFile(__DIR__ . '/../../Fixture/templates/emptyClass.latte');
 		});
 	}
@@ -62,7 +67,7 @@ final class ManualTemplateFileResolverTest extends Tester\TestCase
 	 */
 	public function testSetValidRelativeTemplateFile(): void
 	{
-		Tester\Assert::noError(function () {
+		Assert::noError(function () {
 			$this->resolver->setRelativeFile('templates/second.emptyClass.latte');
 		});
 	}
@@ -72,11 +77,11 @@ final class ManualTemplateFileResolverTest extends Tester\TestCase
 	 */
 	public function testThrowExceptionOnSetMissingTemplateFile(): void
 	{
-		Tester\Assert::exception(
+		Assert::exception(
 			function () {
 				$this->resolver->setFile(__DIR__ . '/foo.latte');
 			},
-			SixtyEightPublishers\SmartNetteComponent\Exception\InvalidStateException::class,
+			InvalidStateException::class,
 			sprintf('Template file %s/foo.latte for component SixtyEightPublishers\SmartNetteComponent\Tests\Fixture\EmptyClass does not exists', __DIR__)
 		);
 	}
@@ -86,11 +91,11 @@ final class ManualTemplateFileResolverTest extends Tester\TestCase
 	 */
 	public function testThrowExceptionOnSetMissingRelativeTemplateFile(): void
 	{
-		Tester\Assert::exception(
+		Assert::exception(
 			function () {
 				$this->resolver->setRelativeFile('templates/emptyClass.third.latte');
 			},
-			SixtyEightPublishers\SmartNetteComponent\Exception\InvalidStateException::class,
+			InvalidStateException::class,
 			sprintf('Template file %s/templates/emptyClass.third.latte for component SixtyEightPublishers\SmartNetteComponent\Tests\Fixture\EmptyClass does not exists', __DIR__ . '/../../Fixture')
 		);
 	}
@@ -106,9 +111,9 @@ final class ManualTemplateFileResolverTest extends Tester\TestCase
 		$this->resolver->setFile($firstFile);
 		$this->resolver->setFile($secondFile, 'second');
 
-		Tester\Assert::same(realpath($firstFile), $this->resolver->resolve());
-		Tester\Assert::same(realpath($secondFile), $this->resolver->resolve('second'));
-		Tester\Assert::same('FALLBACK_FOO', $this->resolver->resolve('foo'));
+		Assert::same(realpath($firstFile), $this->resolver->resolve());
+		Assert::same(realpath($secondFile), $this->resolver->resolve('second'));
+		Assert::same('FALLBACK_FOO', $this->resolver->resolve('foo'));
 	}
 }
 

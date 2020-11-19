@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\Exception;
 
-interface IException
+interface ExceptionInterface
 {
 }

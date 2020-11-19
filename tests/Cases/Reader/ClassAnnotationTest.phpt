@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\Tests\Cases\Reader;
 
-use Tester;
 use Mockery;
-use SixtyEightPublishers;
+use stdClass;
+use Tester\Assert;
+use Tester\TestCase;
+use SixtyEightPublishers\SmartNetteComponent\Reader\ClassAnnotation;
 
 require __DIR__ . '/../../bootstrap.php';
 
-final class ClassAnnotationTest extends Tester\TestCase
+final class ClassAnnotationTest extends TestCase
 {
 	/**
 	 * {@inheritdoc}
@@ -27,16 +29,16 @@ final class ClassAnnotationTest extends Tester\TestCase
 	 */
 	public function testBase(): void
 	{
-		$classAnnotation = new SixtyEightPublishers\SmartNetteComponent\Reader\ClassAnnotation(
+		$classAnnotation = new ClassAnnotation(
 			$reflection = Mockery::mock(\ReflectionClass::class),
-			$object = new \stdClass()
+			$object = new stdClass()
 		);
 
-		Tester\Assert::same($reflection, $classAnnotation->getReflectionClass());
-		Tester\Assert::same($reflection, $classAnnotation->reflectionClass);
+		Assert::same($reflection, $classAnnotation->getReflectionClass());
+		Assert::same($reflection, $classAnnotation->reflectionClass);
 
-		Tester\Assert::same($object, $classAnnotation->getAnnotation());
-		Tester\Assert::same($object, $classAnnotation->annotation);
+		Assert::same($object, $classAnnotation->getAnnotation());
+		Assert::same($object, $classAnnotation->annotation);
 	}
 }
 

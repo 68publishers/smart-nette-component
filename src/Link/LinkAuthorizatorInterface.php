@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\Link;
 
-interface ILinkAuthorizator
+interface LinkAuthorizatorInterface
 {
 	/**
 	 * @param string $presenterClassName

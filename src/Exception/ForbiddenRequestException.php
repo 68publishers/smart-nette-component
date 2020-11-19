@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\Exception;
 
-use Nette;
-use SixtyEightPublishers;
+use Throwable;
+use Nette\Application\ForbiddenRequestException as NetteForbiddenRequestException;
+use SixtyEightPublishers\SmartNetteComponent\Annotation\AuthorizationAnnotationInterface;
 
-final class ForbiddenRequestException extends Nette\Application\ForbiddenRequestException implements IException
+final class ForbiddenRequestException extends NetteForbiddenRequestException implements ExceptionInterface
 {
-	/** @var \SixtyEightPublishers\SmartNetteComponent\Annotation\IAuthorizationAnnotation  */
+	/** @var \SixtyEightPublishers\SmartNetteComponent\Annotation\AuthorizationAnnotationInterface  */
 	private $annotation;
 
 	/**
-	 * @param \SixtyEightPublishers\SmartNetteComponent\Annotation\IAuthorizationAnnotation $annotation
-	 * @param string                                                                        $message
-	 * @param int                                                                           $httpCode
-	 * @param \Exception|NULL                                                               $previous
+	 * @param \SixtyEightPublishers\SmartNetteComponent\Annotation\AuthorizationAnnotationInterface $annotation
+	 * @param string                                                                                $message
+	 * @param int                                                                                   $httpCode
+	 * @param \Throwable|NULL                                                                       $previous
 	 */
-	public function __construct(SixtyEightPublishers\SmartNetteComponent\Annotation\IAuthorizationAnnotation $annotation, string $message = '', int $httpCode = 0, \Exception $previous = NULL)
+	public function __construct(AuthorizationAnnotationInterface $annotation, string $message = '', int $httpCode = 0, Throwable $previous = NULL)
 	{
 		parent::__construct($message, $httpCode ?: $this->code, $previous);
 
@@ -26,9 +27,9 @@ final class ForbiddenRequestException extends Nette\Application\ForbiddenRequest
 	}
 
 	/**
-	 * @return \SixtyEightPublishers\SmartNetteComponent\Annotation\IAuthorizationAnnotation
+	 * @return \SixtyEightPublishers\SmartNetteComponent\Annotation\AuthorizationAnnotationInterface
 	 */
-	public function getAnnotation(): SixtyEightPublishers\SmartNetteComponent\Annotation\IAuthorizationAnnotation
+	public function getAnnotation(): AuthorizationAnnotationInterface
 	{
 		return $this->annotation;
 	}

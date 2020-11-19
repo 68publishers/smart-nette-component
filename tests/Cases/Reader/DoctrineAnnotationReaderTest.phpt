@@ -4,14 +4,20 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\Tests\Cases\Reader;
 
-use Tester;
 use Mockery;
-use Doctrine;
-use SixtyEightPublishers;
+use Tester\Assert;
+use Tester\TestCase;
+use ReflectionClass;
+use ReflectionMethod;
+use Doctrine\Common\Annotations\Reader;
+use SixtyEightPublishers\SmartNetteComponent\Annotation\LoggedIn;
+use SixtyEightPublishers\SmartNetteComponent\Annotation\IsInRole;
+use SixtyEightPublishers\SmartNetteComponent\Reader\ClassAnnotation;
+use SixtyEightPublishers\SmartNetteComponent\Reader\DoctrineAnnotationReader;
 
 require __DIR__ . '/../../bootstrap.php';
 
-final class DoctrineAnnotationReaderTest extends Tester\TestCase
+final class DoctrineAnnotationReaderTest extends TestCase
 {
 	/**
 	 * {@inheritdoc}
@@ -29,18 +35,17 @@ final class DoctrineAnnotationReaderTest extends Tester\TestCase
 	public function testGetClassAnnotations(): void
 	{
 		# annotations
-		$loggedIn = new SixtyEightPublishers\SmartNetteComponent\Annotation\LoggedIn();
+		$loggedIn = new LoggedIn();
+		$isInRole = new IsInRole();
+		$isInRole2 = new IsInRole();
 
-		$isInRole = new SixtyEightPublishers\SmartNetteComponent\Annotation\IsInRole();
 		$isInRole->name = 'foo';
-
-		$isInRole2 = new SixtyEightPublishers\SmartNetteComponent\Annotation\IsInRole();
 		$isInRole2->name = 'bar';
 
 		# mocks
-		$fooReflection = Mockery::mock(\ReflectionClass::class);
-		$barReflection = Mockery::mock(\ReflectionClass::class);
-		$reader = Mockery::mock(Doctrine\Common\Annotations\Reader::class);
+		$fooReflection = Mockery::mock(ReflectionClass::class);
+		$barReflection = Mockery::mock(ReflectionClass::class);
+		$reader = Mockery::mock(Reader::class);
 
 		$fooReflection->shouldReceive('getName')->andReturn('Foo');
 		$fooReflection->shouldReceive('getParentClass')->andReturn(FALSE);
@@ -59,21 +64,21 @@ final class DoctrineAnnotationReaderTest extends Tester\TestCase
 
 		# asserts
 
-		$doctrineAnnotationReader = new SixtyEightPublishers\SmartNetteComponent\Reader\DoctrineAnnotationReader($reader);
+		$doctrineAnnotationReader = new DoctrineAnnotationReader($reader);
 
-		Tester\Assert::equal([
-			new SixtyEightPublishers\SmartNetteComponent\Reader\ClassAnnotation($fooReflection, $loggedIn),
-			new SixtyEightPublishers\SmartNetteComponent\Reader\ClassAnnotation($fooReflection, $isInRole),
+		Assert::equal([
+			new ClassAnnotation($fooReflection, $loggedIn),
+			new ClassAnnotation($fooReflection, $isInRole),
 		], $doctrineAnnotationReader->getClassAnnotations($fooReflection));
 
-		Tester\Assert::equal([
-			new SixtyEightPublishers\SmartNetteComponent\Reader\ClassAnnotation($fooReflection, $loggedIn),
-			new SixtyEightPublishers\SmartNetteComponent\Reader\ClassAnnotation($fooReflection, $isInRole),
-			new SixtyEightPublishers\SmartNetteComponent\Reader\ClassAnnotation($barReflection, $isInRole2),
+		Assert::equal([
+			new ClassAnnotation($fooReflection, $loggedIn),
+			new ClassAnnotation($fooReflection, $isInRole),
+			new ClassAnnotation($barReflection, $isInRole2),
 		], $doctrineAnnotationReader->getClassAnnotations($barReflection));
 
-		Tester\Assert::equal([
-			new SixtyEightPublishers\SmartNetteComponent\Reader\ClassAnnotation($barReflection, $isInRole2),
+		Assert::equal([
+			new ClassAnnotation($barReflection, $isInRole2),
 		], $doctrineAnnotationReader->getClassAnnotations($barReflection, 'Bar'));
 	}
 
@@ -83,14 +88,14 @@ final class DoctrineAnnotationReaderTest extends Tester\TestCase
 	public function testGetMethodAnnotations(): void
 	{
 		# annotations
-		$loggedIn = new SixtyEightPublishers\SmartNetteComponent\Annotation\LoggedIn();
+		$loggedIn = new LoggedIn();
+		$isInRole = new IsInRole();
 
-		$isInRole = new SixtyEightPublishers\SmartNetteComponent\Annotation\IsInRole();
 		$isInRole->name = 'foo';
 
 		# mocks
-		$reflection = Mockery::mock(\ReflectionMethod::class);
-		$reader = Mockery::mock(Doctrine\Common\Annotations\Reader::class);
+		$reflection = Mockery::mock(ReflectionMethod::class);
+		$reader = Mockery::mock(Reader::class);
 
 		$reader->shouldReceive('getMethodAnnotations')->once()->with($reflection)->andReturn([
 			$loggedIn,
@@ -98,9 +103,9 @@ final class DoctrineAnnotationReaderTest extends Tester\TestCase
 		]);
 
 		# asserts
-		$doctrineAnnotationReader = new SixtyEightPublishers\SmartNetteComponent\Reader\DoctrineAnnotationReader($reader);
+		$doctrineAnnotationReader = new DoctrineAnnotationReader($reader);
 
-		Tester\Assert::equal([
+		Assert::equal([
 			$loggedIn,
 			$isInRole,
 		], $doctrineAnnotationReader->getMethodAnnotations($reflection));

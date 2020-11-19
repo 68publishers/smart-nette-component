@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\TemplateResolver;
 
-interface ITemplateFileResolver
+interface TemplateFileResolverInterface
 {
 	/**
 	 * @param string $type

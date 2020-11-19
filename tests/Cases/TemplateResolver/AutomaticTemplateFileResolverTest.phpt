@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\Tests\Cases\TemplateResolver;
 
-use Tester;
-use SixtyEightPublishers;
+use Tester\Assert;
+use Tester\TestCase;
+use SixtyEightPublishers\SmartNetteComponent\Tests\Fixture\EmptyClass;
+use SixtyEightPublishers\SmartNetteComponent\TemplateResolver\Metadata;
+use SixtyEightPublishers\SmartNetteComponent\Exception\InvalidStateException;
+use SixtyEightPublishers\SmartNetteComponent\TemplateResolver\AutomaticTemplateFileResolver;
 
 require __DIR__ . '/../../bootstrap.php';
 
-final class AutomaticTemplateFileResolverTest extends Tester\TestCase
+final class AutomaticTemplateFileResolverTest extends TestCase
 {
 	/** @var \SixtyEightPublishers\SmartNetteComponent\TemplateResolver\AutomaticTemplateFileResolver */
 	private $resolver;
@@ -21,13 +25,13 @@ final class AutomaticTemplateFileResolverTest extends Tester\TestCase
 	{
 		parent::setUp();
 
-		$metadata = new SixtyEightPublishers\SmartNetteComponent\TemplateResolver\Metadata(
-			SixtyEightPublishers\SmartNetteComponent\Tests\Fixture\EmptyClass::class,
+		$metadata = new Metadata(
+			EmptyClass::class,
 			'EmptyClass',
 			__DIR__ . '/../../Fixture/templates/'
 		);
 
-		$this->resolver = new SixtyEightPublishers\SmartNetteComponent\TemplateResolver\AutomaticTemplateFileResolver($metadata);
+		$this->resolver = new AutomaticTemplateFileResolver($metadata);
 	}
 
 	/**
@@ -35,7 +39,7 @@ final class AutomaticTemplateFileResolverTest extends Tester\TestCase
 	 */
 	public function testResolveDefaultFile(): void
 	{
-		Tester\Assert::same(realpath(__DIR__ . '/../../Fixture/templates/emptyClass.latte'), $this->resolver->resolve());
+		Assert::same(realpath(__DIR__ . '/../../Fixture/templates/emptyClass.latte'), $this->resolver->resolve());
 	}
 
 	/**
@@ -43,8 +47,8 @@ final class AutomaticTemplateFileResolverTest extends Tester\TestCase
 	 */
 	public function testResolveNamedFile(): void
 	{
-		Tester\Assert::same(realpath(__DIR__ . '/../../Fixture/templates/second.emptyClass.latte'), $this->resolver->resolve('second'));
-		Tester\Assert::same(realpath(__DIR__ . '/../../Fixture/templates/upper.EmptyClass.latte'), $this->resolver->resolve('upper'));
+		Assert::same(realpath(__DIR__ . '/../../Fixture/templates/second.emptyClass.latte'), $this->resolver->resolve('second'));
+		Assert::same(realpath(__DIR__ . '/../../Fixture/templates/upper.EmptyClass.latte'), $this->resolver->resolve('upper'));
 	}
 
 	/**
@@ -52,11 +56,11 @@ final class AutomaticTemplateFileResolverTest extends Tester\TestCase
 	 */
 	public function testThrowExceptionOnMissingFile(): void
 	{
-		Tester\Assert::exception(
+		Assert::exception(
 			function () {
 				$this->resolver->resolve('third');
 			},
-			SixtyEightPublishers\SmartNetteComponent\Exception\InvalidStateException::class,
+			InvalidStateException::class,
 			'Can not find template file for component SixtyEightPublishers\SmartNetteComponent\Tests\Fixture\EmptyClass [type \'third\']'
 		);
 	}

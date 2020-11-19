@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\TemplateResolver;
 
-use Nette;
+use Nette\SmartObject;
 
 /**
  * @property-read string $name
@@ -13,7 +13,7 @@ use Nette;
  */
 final class Metadata
 {
-	use Nette\SmartObject;
+	use SmartObject;
 
 	/** @var string  */
 	private $name;

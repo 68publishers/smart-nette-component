@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\Reader;
 
-use Nette;
-use Doctrine;
+use ReflectionClass;
+use ReflectionMethod;
+use Nette\SmartObject;
+use Doctrine\Common\Annotations\Reader;
 
-final class DoctrineAnnotationReader implements IAnnotationReader
+final class DoctrineAnnotationReader implements AnnotationReaderInterface
 {
-	use Nette\SmartObject;
+	use SmartObject;
 
 	/** @var \Doctrine\Common\Annotations\Reader  */
 	private $reader;
@@ -20,7 +22,7 @@ final class DoctrineAnnotationReader implements IAnnotationReader
 	/**
 	 * @param \Doctrine\Common\Annotations\Reader $reader
 	 */
-	public function __construct(Doctrine\Common\Annotations\Reader $reader)
+	public function __construct(Reader $reader)
 	{
 		$this->reader = $reader;
 	}
@@ -31,7 +33,7 @@ final class DoctrineAnnotationReader implements IAnnotationReader
 	 *
 	 * @return \SixtyEightPublishers\SmartNetteComponent\Reader\ClassAnnotation[]
 	 */
-	private function composeClassAnnotations(\ReflectionClass $reflectionClass, ?string $stopBeforeParent = NULL): array
+	private function composeClassAnnotations(ReflectionClass $reflectionClass, ?string $stopBeforeParent = NULL): array
 	{
 		$parent = $reflectionClass->getParentClass();
 
@@ -39,7 +41,7 @@ final class DoctrineAnnotationReader implements IAnnotationReader
 			return new ClassAnnotation($reflectionClass, $annotation);
 		}, $this->reader->getClassAnnotations($reflectionClass)));
 
-		if ($parent instanceof \ReflectionClass && (NULL === $stopBeforeParent || ($reflectionClass->getName() !== $stopBeforeParent && $parent->getName() !== $stopBeforeParent))) {
+		if ($parent instanceof ReflectionClass && (NULL === $stopBeforeParent || ($reflectionClass->getName() !== $stopBeforeParent && $parent->getName() !== $stopBeforeParent))) {
 			$result = array_merge($this->composeClassAnnotations($parent, $stopBeforeParent), $result);
 		}
 
@@ -51,7 +53,7 @@ final class DoctrineAnnotationReader implements IAnnotationReader
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getClassAnnotations(\ReflectionClass $reflectionClass, ?string $stopBeforeParent = NULL): array
+	public function getClassAnnotations(ReflectionClass $reflectionClass, ?string $stopBeforeParent = NULL): array
 	{
 		$key = sprintf('%s.%s', $reflectionClass->getName(), (string) $stopBeforeParent);
 
@@ -65,7 +67,7 @@ final class DoctrineAnnotationReader implements IAnnotationReader
 	/**
 	 * {@inheritdoc}
 	 */
-	public function getMethodAnnotations(\ReflectionMethod $reflectionMethod): array
+	public function getMethodAnnotations(ReflectionMethod $reflectionMethod): array
 	{
 		return $this->reader->getMethodAnnotations($reflectionMethod);
 	}

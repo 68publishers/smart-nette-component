@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\TemplateResolver;
 
-use Nette;
-use SixtyEightPublishers;
+use Nette\SmartObject;
+use SixtyEightPublishers\SmartNetteComponent\Exception\InvalidStateException;
 
-final class ManualTemplateFileResolver implements ITemplateFileResolver
+final class ManualTemplateFileResolver implements TemplateFileResolverInterface
 {
-	use Nette\SmartObject;
+	use SmartObject;
 
-	/** @var \SixtyEightPublishers\SmartNetteComponent\TemplateResolver\ITemplateFileResolver  */
+	/** @var \SixtyEightPublishers\SmartNetteComponent\TemplateResolver\TemplateFileResolverInterface  */
 	private $fallback;
 
 	/** @var \SixtyEightPublishers\SmartNetteComponent\TemplateResolver\Metadata  */
@@ -21,10 +21,10 @@ final class ManualTemplateFileResolver implements ITemplateFileResolver
 	private $templateFiles = [];
 
 	/**
-	 * @param \SixtyEightPublishers\SmartNetteComponent\TemplateResolver\ITemplateFileResolver $fallback
-	 * @param \SixtyEightPublishers\SmartNetteComponent\TemplateResolver\Metadata              $metadata
+	 * @param \SixtyEightPublishers\SmartNetteComponent\TemplateResolver\TemplateFileResolverInterface $fallback
+	 * @param \SixtyEightPublishers\SmartNetteComponent\TemplateResolver\Metadata                      $metadata
 	 */
-	public function __construct(ITemplateFileResolver $fallback, Metadata $metadata)
+	public function __construct(TemplateFileResolverInterface $fallback, Metadata $metadata)
 	{
 		$this->fallback = $fallback;
 		$this->metadata = $metadata;
@@ -39,7 +39,7 @@ final class ManualTemplateFileResolver implements ITemplateFileResolver
 	public function setFile(string $file, string $type = ''): void
 	{
 		if (FALSE === file_exists($file)) {
-			throw new SixtyEightPublishers\SmartNetteComponent\Exception\InvalidStateException(sprintf(
+			throw new InvalidStateException(sprintf(
 				'Template file %s for component %s does not exists',
 				$file,
 				$this->metadata->name

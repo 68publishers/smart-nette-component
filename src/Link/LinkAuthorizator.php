@@ -4,14 +4,22 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\Link;
 
-use Nette;
-use SixtyEightPublishers;
+use ReflectionClass;
+use ReflectionMethod;
+use Nette\SmartObject;
+use Nette\Security\User;
+use Nette\Application\UI\Component;
+use Nette\Application\UI\Presenter as NettePresenter;
+use SixtyEightPublishers\SmartNetteComponent\UI\Control;
+use SixtyEightPublishers\SmartNetteComponent\UI\Presenter;
+use SixtyEightPublishers\SmartNetteComponent\Reader\AnnotationReaderInterface;
+use SixtyEightPublishers\SmartNetteComponent\Annotation\AuthorizationAnnotationInterface;
 
-final class LinkAuthorizator implements ILinkAuthorizator
+final class LinkAuthorizator implements LinkAuthorizatorInterface
 {
-	use Nette\SmartObject;
+	use SmartObject;
 
-	/** @var \SixtyEightPublishers\SmartNetteComponent\Reader\IAnnotationReader  */
+	/** @var \SixtyEightPublishers\SmartNetteComponent\Reader\AnnotationReaderInterface  */
 	private $annotationReader;
 
 	/** @var \Nette\Security\User  */
@@ -21,10 +29,10 @@ final class LinkAuthorizator implements ILinkAuthorizator
 	private $cache = [];
 
 	/**
-	 * @param \SixtyEightPublishers\SmartNetteComponent\Reader\IAnnotationReader $annotationReader
-	 * @param \Nette\Security\User                                               $user
+	 * @param \SixtyEightPublishers\SmartNetteComponent\Reader\AnnotationReaderInterface $annotationReader
+	 * @param \Nette\Security\User                                                       $user
 	 */
-	public function __construct(SixtyEightPublishers\SmartNetteComponent\Reader\IAnnotationReader $annotationReader, Nette\Security\User $user)
+	public function __construct(AnnotationReaderInterface $annotationReader, User $user)
 	{
 		$this->annotationReader = $annotationReader;
 		$this->user = $user;
@@ -37,7 +45,7 @@ final class LinkAuthorizator implements ILinkAuthorizator
 	 */
 	private function checkAnnotation($annotation): bool
 	{
-		if ($annotation instanceof SixtyEightPublishers\SmartNetteComponent\Annotation\IAuthorizationAnnotation) {
+		if ($annotation instanceof AuthorizationAnnotationInterface) {
 			return $annotation->isAllowed($this->user);
 		}
 
@@ -49,7 +57,7 @@ final class LinkAuthorizator implements ILinkAuthorizator
 	 *
 	 * @return bool
 	 */
-	private function resolveClass(\ReflectionClass $reflectionClass): bool
+	private function resolveClass(ReflectionClass $reflectionClass): bool
 	{
 		foreach ($this->annotationReader->getClassAnnotations($reflectionClass) as $classAnnotation) {
 			if (FALSE === $this->checkAnnotation($classAnnotation->getAnnotation())) {
@@ -65,7 +73,7 @@ final class LinkAuthorizator implements ILinkAuthorizator
 	 *
 	 * @return bool
 	 */
-	private function resolveMethod(\ReflectionMethod $reflectionMethod): bool
+	private function resolveMethod(ReflectionMethod $reflectionMethod): bool
 	{
 		foreach ($this->annotationReader->getMethodAnnotations($reflectionMethod) as $methodAnnotation) {
 			if (FALSE === $this->checkAnnotation($methodAnnotation)) {
@@ -81,16 +89,17 @@ final class LinkAuthorizator implements ILinkAuthorizator
 	 * @param string $action
 	 *
 	 * @return bool
+	 * @throws \ReflectionException
 	 */
 	private function resolveAction(string $presenterClassName, string $action): bool
 	{
-		$reflection = new \ReflectionClass($presenterClassName);
+		$reflection = new ReflectionClass($presenterClassName);
 
 		if (FALSE === $this->resolveClass($reflection)) {
 			return FALSE;
 		}
 
-		if (TRUE === $reflection->hasMethod($action = Nette\Application\UI\Presenter::formatActionMethod($action))
+		if (TRUE === $reflection->hasMethod($action = NettePresenter::formatActionMethod($action))
 			&& FALSE === $this->resolveMethod($reflection->getMethod($action))) {
 			return FALSE;
 		}
@@ -104,15 +113,16 @@ final class LinkAuthorizator implements ILinkAuthorizator
 	 * @param bool   $checkClass
 	 *
 	 * @return bool
+	 * @throws \ReflectionException
 	 */
 	private function resolveSignal(string $controlClassName, string $signal, bool $checkClass): bool
 	{
-		if (TRUE === $checkClass && FALSE === $this->resolveClass($reflection = new \ReflectionClass($controlClassName))) {
+		if (TRUE === $checkClass && FALSE === $this->resolveClass($reflection = new ReflectionClass($controlClassName))) {
 			return FALSE;
 		}
 
-		$signal = Nette\Application\UI\Component::formatSignalMethod($signal);
-		$reflection = isset($reflection) ? $reflection->getMethod($signal) : new \ReflectionMethod($controlClassName, $signal);
+		$signal = Component::formatSignalMethod($signal);
+		$reflection = isset($reflection) ? $reflection->getMethod($signal) : new ReflectionMethod($controlClassName, $signal);
 
 		return $this->resolveMethod($reflection);
 	}
@@ -121,6 +131,7 @@ final class LinkAuthorizator implements ILinkAuthorizator
 
 	/**
 	 * {@inheritdoc}
+	 * @throws \ReflectionException
 	 */
 	public function isActionAllowed(string $presenterClassName, string $action = 'default'): bool
 	{
@@ -128,7 +139,7 @@ final class LinkAuthorizator implements ILinkAuthorizator
 			return $this->cache[$key];
 		}
 
-		if (!is_subclass_of($presenterClassName, SixtyEightPublishers\SmartNetteComponent\UI\Presenter::class, TRUE)) {
+		if (!is_subclass_of($presenterClassName, Presenter::class, TRUE)) {
 			return $this->cache[$key] = TRUE;
 		}
 
@@ -137,6 +148,7 @@ final class LinkAuthorizator implements ILinkAuthorizator
 
 	/**
 	 * {@inheritdoc}
+	 * @throws \ReflectionException
 	 */
 	public function isSignalAllowed(string $controlClassName, string $signal): bool
 	{
@@ -146,8 +158,8 @@ final class LinkAuthorizator implements ILinkAuthorizator
 			return $this->cache[$key];
 		}
 
-		if (!($isPresenter = is_subclass_of($controlClassName, SixtyEightPublishers\SmartNetteComponent\UI\Presenter::class, TRUE))
-			&& !is_subclass_of($controlClassName, SixtyEightPublishers\SmartNetteComponent\UI\Control::class, TRUE)) {
+		if (!($isPresenter = is_subclass_of($controlClassName, Presenter::class, TRUE))
+			&& !is_subclass_of($controlClassName, Control::class, TRUE)) {
 			return $this->cache[$key] = TRUE;
 		}
 
