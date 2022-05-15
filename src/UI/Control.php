@@ -32,6 +32,14 @@ abstract class Control extends NetteControl
 	/**
 	 * @return void
 	 */
+	public function render(): void
+	{
+		$this->doRender();
+	}
+
+	/**
+	 * @return void
+	 */
 	protected function beforeRender(): void
 	{
 	}
@@ -46,6 +54,19 @@ abstract class Control extends NetteControl
 		$this->template->setFile($this->getTemplateFileResolver()->resolve($type));
 		$this->beforeRender();
 		$this->template->render();
+	}
+
+	/**
+	 * @param string $type
+	 *
+	 * @return void
+	 */
+	protected function doRenderToString(string $type = ''): string
+	{
+		$this->template->setFile($this->getTemplateFileResolver()->resolve($type));
+		$this->beforeRender();
+
+		return $this->template->renderToString();
 	}
 
 	/**
@@ -77,7 +98,7 @@ abstract class Control extends NetteControl
 	/**
 	 * @return \SixtyEightPublishers\SmartNetteComponent\TemplateResolver\ManualTemplateFileResolver
 	 */
-	private function getTemplateFileResolver(): ManualTemplateFileResolver
+	protected function getTemplateFileResolver(): ManualTemplateFileResolver
 	{
 		return $this->templateFileResolver
 			?? $this->templateFileResolver = TemplateFileResolverFactory::create(static::class, 'templates');
