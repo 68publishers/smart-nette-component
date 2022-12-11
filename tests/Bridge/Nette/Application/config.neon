@@ -1,0 +1,14 @@
+extensions:
+	smart_nette_components: SixtyEightPublishers\SmartNetteComponent\Bridge\Nette\DI\ComponentAuthorizationExtension
+
+smart_nette_components:
+	cache: no
+
+application:
+	scanDirs:
+		- %testsDir%
+	mapping:
+		Tests: SixtyEightPublishers\SmartNetteComponent\Tests\Fixtures\*Presenter
+
+services:
+	- SixtyEightPublishers\SmartNetteComponent\Tests\Fixtures\BComponentFactoryInterface

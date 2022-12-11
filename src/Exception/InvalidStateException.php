@@ -6,6 +6,6 @@ namespace SixtyEightPublishers\SmartNetteComponent\Exception;
 
 use RuntimeException;
 
-final class InvalidStateException extends RuntimeException implements ExceptionInterface
+final class InvalidStateException extends RuntimeException
 {
 }

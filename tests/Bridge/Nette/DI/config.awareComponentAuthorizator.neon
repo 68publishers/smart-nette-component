@@ -1,0 +1,19 @@
+extensions:
+	smart_nette_components: SixtyEightPublishers\SmartNetteComponent\Bridge\Nette\DI\ComponentAuthorizationExtension
+
+smart_nette_components:
+	cache: no
+
+application:
+	scanDirs: false
+	scanComposer: false
+
+services:
+	- SixtyEightPublishers\SmartNetteComponent\Tests\Fixtures\AComponentFactoryInterface
+	- SixtyEightPublishers\SmartNetteComponent\Tests\Fixtures\BComponentFactoryInterface
+	- SixtyEightPublishers\SmartNetteComponent\Tests\Fixtures\ServiceWithComponentAuthorizator
+
+	# register presenters manually as service for testing purposes
+	bPresenter: SixtyEightPublishers\SmartNetteComponent\Tests\Fixtures\BPresenter
+	dPresenter: SixtyEightPublishers\SmartNetteComponent\Tests\Fixtures\DPresenter
+	ePresenter: SixtyEightPublishers\SmartNetteComponent\Tests\Fixtures\EPresenter

@@ -4,59 +4,12 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\TemplateResolver;
 
-use Nette\SmartObject;
-
-/**
- * @property-read string $name
- * @property-read string $shortName
- * @property-read string $basePath
- */
 final class Metadata
 {
-	use SmartObject;
-
-	/** @var string  */
-	private $name;
-
-	/** @var string  */
-	private $shortName;
-
-	/** @var string  */
-	private $basePath;
-
-	/**
-	 * @param string $name
-	 * @param string $shortName
-	 * @param string $basePath
-	 */
-	public function __construct(string $name, string $shortName, string $basePath)
-	{
-		$this->name = $name;
-		$this->shortName = $shortName;
-		$this->basePath = $basePath;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getName(): string
-	{
-		return $this->name;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getShortName(): string
-	{
-		return $this->shortName;
-	}
-
-	/**
-	 * @return string
-	 */
-	public function getBasePath(): string
-	{
-		return $this->basePath;
+	public function __construct(
+		public readonly string $name,
+		public readonly string $shortName,
+		public readonly string $basePath
+	) {
 	}
 }

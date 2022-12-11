@@ -5,21 +5,23 @@ declare(strict_types=1);
 namespace SixtyEightPublishers\SmartNetteComponent\TemplateResolver;
 
 use ReflectionClass;
-use Nette\StaticClass;
+use function md5;
+use function trim;
+use function rtrim;
+use function is_dir;
+use function dirname;
+use function sprintf;
+use function array_key_exists;
 
 final class TemplateFileResolverFactory
 {
-	use StaticClass;
+	private function __construct()
+	{
+	}
 
-	/** @var array  */
-	private static $automaticCache = [];
+	/** @var array<string, AutomaticTemplateFileResolver> */
+	private static array $automaticCache = [];
 
-	/**
-	 * @param string $className
-	 * @param string $path
-	 *
-	 * @return \SixtyEightPublishers\SmartNetteComponent\TemplateResolver\ManualTemplateFileResolver
-	 */
 	public static function create(string $className, string $path): ManualTemplateFileResolver
 	{
 		$resolver = self::getAutomaticResolver($className, $path);
@@ -28,11 +30,6 @@ final class TemplateFileResolverFactory
 	}
 
 	/**
-	 * @param string $className
-	 * @param string $path
-	 *
-	 * @return \SixtyEightPublishers\SmartNetteComponent\TemplateResolver\AutomaticTemplateFileResolver
-	 * @noinspection PhpDocMissingThrowsInspection
 	 * @noinspection PhpUnhandledExceptionInspection
 	 */
 	private static function getAutomaticResolver(string $className, string $path): AutomaticTemplateFileResolver
