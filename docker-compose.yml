@@ -1,0 +1,20 @@
+version: "3.7"
+
+services:
+    php81:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: php81
+        container_name: 68publishers.smart-nette-component.81
+        volumes:
+            - .:/var/www/html:cached
+
+    php82:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            target: php82
+        container_name: 68publishers.smart-nette-component.82
+        volumes:
+            - .:/var/www/html:cached

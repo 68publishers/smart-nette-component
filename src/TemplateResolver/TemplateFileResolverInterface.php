@@ -6,10 +6,5 @@ namespace SixtyEightPublishers\SmartNetteComponent\TemplateResolver;
 
 interface TemplateFileResolverInterface
 {
-	/**
-	 * @param string $type
-	 *
-	 * @return string
-	 */
 	public function resolve(string $type = ''): string;
 }

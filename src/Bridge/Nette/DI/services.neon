@@ -1,0 +1,55 @@
+services:
+	# attribute reader
+	reader:
+		autowired: SixtyEightPublishers\SmartNetteComponent\Reader\AttributeReaderInterface
+		type: SixtyEightPublishers\SmartNetteComponent\Reader\AttributeReaderInterface
+		factory: SixtyEightPublishers\SmartNetteComponent\Reader\RuntimeCachedAttributeReader(
+			inner: @extension.reader.inner
+		)
+
+	reader.inner:
+		autowired: no
+		factory: SixtyEightPublishers\SmartNetteComponent\Reader\AttributeReader
+
+	# rules provider
+	authorization.rules_provider:
+		autowired: SixtyEightPublishers\SmartNetteComponent\Authorization\AuthorizationRulesProviderInterface
+		type: SixtyEightPublishers\SmartNetteComponent\Authorization\AuthorizationRulesProviderInterface
+		factory: @extension.authorization.rules_provider.default
+
+	authorization.rules_provider.default:
+		autowired: no
+		factory: SixtyEightPublishers\SmartNetteComponent\Authorization\AttributeBasedAuthorizationRulesProvider
+
+	# component authorizator
+	authorization.component_authorizator:
+		autowired: SixtyEightPublishers\SmartNetteComponent\Authorization\ComponentAuthorizatorInterface
+		type: SixtyEightPublishers\SmartNetteComponent\Authorization\ComponentAuthorizatorInterface
+		factory: @extension.authorization.component_authorizator.default
+
+	authorization.component_authorizator.default:
+		autowired: no
+		factory: SixtyEightPublishers\SmartNetteComponent\Authorization\ComponentAuthorizator(
+			handler: @extension.authorization.handler
+		)
+
+	# authorization handlers
+	authorization.handler:
+		autowired: no
+		factory: SixtyEightPublishers\SmartNetteComponent\Authorization\Handler\HandlerRegistry
+
+	authorization.handler.allowed:
+		autowired: no
+		factory: SixtyEightPublishers\SmartNetteComponent\Authorization\Handler\AllowedHandler
+
+	authorization.handler.in_role:
+		autowired: no
+		factory: SixtyEightPublishers\SmartNetteComponent\Authorization\Handler\InRoleHandler
+
+	authorization.handler.logged_in:
+		autowired: no
+		factory: SixtyEightPublishers\SmartNetteComponent\Authorization\Handler\LoggedInHandler
+
+	authorization.handler.logged_out:
+		autowired: no
+		factory: SixtyEightPublishers\SmartNetteComponent\Authorization\Handler\LoggedOutHandler

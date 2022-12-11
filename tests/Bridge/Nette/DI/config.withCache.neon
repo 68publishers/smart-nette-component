@@ -1,0 +1,7 @@
+extensions:
+	smart_nette_components: SixtyEightPublishers\SmartNetteComponent\Bridge\Nette\DI\ComponentAuthorizationExtension
+
+smart_nette_components:
+	cache: yes
+	scanDirs!:
+		- %testsDir%
