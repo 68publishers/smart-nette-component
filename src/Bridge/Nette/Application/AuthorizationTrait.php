@@ -53,7 +53,7 @@ trait AuthorizationTrait
 	/**
 	 * Override this method is you want to redirect, show flash message etc.
 	 */
-	protected function onForbiddenRequest(ForbiddenRequestException $annotation): void
+	protected function onForbiddenRequest(ForbiddenRequestException $exception): void
 	{
 	}
 }
