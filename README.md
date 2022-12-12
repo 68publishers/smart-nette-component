@@ -1,177 +1,224 @@
-# Smart Nette Components
+<h1 align="center">Smart Nette Component</h1>
 
-This package adds some useful features for Nette Presenters and Components like:
+<p align="center">This package adds some useful features for Nette Presenters and Components, such as authorization for Presenters, their actions and signals using PHP8 attributes, authorization for component signals using attributes, and resolving of component template files.</p>
 
-- authorization annotations over `Presenter` classes, `action*` and `handle*` methods
-- authorization annotations over `handle*` methods in `Control` classes
-- resolving of template files for components
+<p align="center">
+<a href="https://github.com/68publishers/smart-nette-component/actions"><img alt="Checks" src="https://badgen.net/github/checks/68publishers/smart-nette-component/master"></a>
+<a href="https://coveralls.io/github/68publishers/smart-nette-component?branch=master"><img alt="Coverage Status" src="https://coveralls.io/repos/github/68publishers/smart-nette-component/badge.svg?branch=master"></a>
+<a href="https://packagist.org/packages/68publishers/smart-nette-component"><img alt="Total Downloads" src="https://badgen.net/packagist/dt/68publishers/smart-nette-component"></a>
+<a href="https://packagist.org/packages/68publishers/smart-nette-component"><img alt="Latest Version" src="https://badgen.net/packagist/v/68publishers/smart-nette-component"></a>
+<a href="https://packagist.org/packages/68publishers/smart-nette-component"><img alt="PHP Version" src="https://badgen.net/packagist/php/68publishers/smart-nette-component"></a>
+</p>
 
 ## Installation
 
 The best way to install 68publishers/smart-nette-component is using Composer:
 
-```bash
+```sh
 $ composer require 68publishers/smart-nette-component
 ```
 
-then you can register extension into DIC:
+## Authorization attributes
 
-```yaml
+To use the authorization attributes, you need to register a compiler extension.
+
+```neon
 extensions:
-    smart_nette_component: SixtyEightPublishers\SmartNetteComponent\DI\SmartNetteComponentExtension
+    component_authorization: SixtyEightPublishers\SmartNetteComponent\Bridge\Nette\DI\ComponentAuthorizationExtension
+
+# The default configuration (you don't need to define it) is as follows:
+component_authorization:
+    cache: %debugMode%
+    scanDirs:
+    	- %appDir%
+    scanComposer: yes
+    scanFilters:
+    	- *Presenter
+    	- *Control
+    	- *Component
 ```
 
-:exclamation: You also need service of type `Doctrine\Common\Annotations\Reader` registered in DI Container. 
-This package doesn't force you to use any particular implementation, so you can use one of suggested packages (see `composer.json`) or another/manual integration.
+Attributes can be cached when folding the DI container to avoid using reflection at runtime.
+The extension will create a classmap and a map of all attributes automatically, it just needs to know where to look for Presenters and Components.
+This is done with the `scanDirs`, `scanComposer` and `scanFilters` options, which behave similarly to [nette/application](https://doc.nette.org/en/application/configuration#toc-automatic-registration-of-presenters).
 
-## Usage
-
-### Annotations
-
-simple authorization:
+Now add the following trait to your `BasePresenter` and `BaseControl`:
 
 ```php
-use SixtyEightPublishers\SmartNetteComponent\Annotation as A;
+use Nette\Application\UI\Presenter;
+use SixtyEightPublishers\SmartNetteComponent\Bridge\Nette\Application\AuthorizationTrait;
 
-/**
- * @A\LoggedIn()
- */
-class SecuredPresenter extends SixtyEightPublishers\SmartNetteComponent\UI\Presenter
+abstract class BasePresenter extends Presenter
 {
-}
-
-/**
- * @A\IsInRole(name="foo")
- */
-class MoreSecuredPresenter extends SixtyEightPublishers\SmartNetteComponent\UI\Presenter
-{
-	/**
-	 * @A\IsAllowed(resource="foo_resource", privilege="bar")
-	 */
-	public function actionBar() : void
-	{
-	}
-
-	/**
-	 * @A\IsAllowed(resource="foo_resource", privilege="baz")
-	 */
-	public function handleDoBaz() : void
-	{
-	}
-	
-	/**
-	 * By default the exception `SixtyEightPublishers\SmartNetteComponent\Exception\ForbiddenRequestException` is thrown.
-	 * You can override this method and set flash-message or redirect here:
-	 *
-	 * {@inheritdoc}
-	 */
-	protected function onForbiddenRequest(SixtyEightPublishers\SmartNetteComponent\Annotation\AuthorizationAnnotationInterface $annotation): void
-	{
-		$this->flashMessage('...');
-		$this->redirect('...');
-	}
+    use AuthorizationTrait;
 }
 ```
 
-you can also set layout file via annotation:
-
 ```php
-/**
- * Path is relative from presenter location
- *
- * @A\Layount(path="templates/Foo/@myLayout.latte")
- */
-class FooPresenter extends SixtyEightPublishers\SmartNetteComponent\UI\Presenter
+use Nette\Application\UI\Control;
+use SixtyEightPublishers\SmartNetteComponent\Bridge\Nette\Application\AuthorizationTrait;
+
+abstract class BaseControl extends Control
 {
+    use AuthorizationTrait;
 }
 ```
 
-simple authorization in components:
+From now, you can use authorization attributes in your Presenters and Components:
 
 ```php
-class FooControl extends SixtyEightPublishers\SmartNetteComponent\UI\Control
-{
-	/**
-	 * @A\IsLoggedIn()
-	 * @A\IsAllowed(resource="foo_resource", privilege="baz")
-	 */
-	public function handleDoBaz() : void
-	{
-	}
+use SixtyEightPublishers\SmartNetteComponent\Attribute\LoggedIn;
+use SixtyEightPublishers\SmartNetteComponent\Attribute\Allowed;
 
-	/**
-	 * You can use this method in same way as in Presenter
-	 *
-	 * {@inheritdoc}
-	 */
-	protected function onForbiddenRequest(SixtyEightPublishers\SmartNetteComponent\Annotation\AuthorizationAnnotationInterface $annotation): void
-	{
-		$this->flashMessage('...');
-		$this->presenter->redirect('...');
-	}
+#[LoggedIn]
+final class AdminProductPresenter extends BasePresenter
+{
+    #[Allowed('product_resource', 'add')]
+    public function actionAdd(): void {}
+
+    #[Allowed('product_resource', 'delete')]
+    public function handleDelete(): void {}
 }
 ```
 
-### Template resolving
-
 ```php
-class FooControl extends SixtyEightPublishers\SmartNetteComponent\UI\Control
-{
-	/**
-	 * @return void
-	 */
-	public function render() : void
-	{
-		# ...
-		$this->doRender();
-	}
+use SixtyEightPublishers\SmartNetteComponent\Attribute\LoggedIn;
+use SixtyEightPublishers\SmartNetteComponent\Attribute\Allowed;
 
-	/**
-	 * @return void
-	 */
-	public function renderBar() : void
-	{
-		# ...
-		$this->doRender('bar');
-	}
+final class EditOrderControl extends BaseControl
+{
+    #[Allowed('order_resource', 'delete_item')]
+    public function handleDeleteItem(): void {}
 }
 ```
 
-Template for base render method will be resolved as `COMPONENT_DIRECTORY/templates/fooControl.latte` or `COMPONENT_DIRECTORY/templates/FooControl.latte`.
+The Presenter/Component throws the exception `SixtyEightPublishers\SmartNetteComponent\Exception\ForbiddenRequestException` if any of the conditions in the attributes are not met.
 
-Template for `bar` render method will be resolved as `COMPONENT_DIRECTORY/templates/bar.fooControl.latte` or `COMPONENT_DIRECTORY/templates/bar.FooControl.latte`.
+The package includes the following attributes:
 
-Of course you can set template file manually:
+- `Allowed`
+- `InRole`
+- `LoggedIn`
+- `LoggedOut`
+
+If you would like to react somehow to the thrown exception, you can overwrite the `onForbiddenRequest()` method in a Presenter/Component.
 
 ```php
-class BarPresenter extends SixtyEightPublishers\SmartNetteComponent\UI\Presenter
+protected function onForbiddenRequest(ForbiddenRequestException $exception): void
 {
-	protected function createComponentFoo() : FooControl
-	{
-		$control = new FooControl();
-		
-		$control->setFile(__DIR__ . '/path/to/file.latte');
-		# or relatively from Component's directory:
-		$control->setRelativeFile('templates/new/fooControl.latte');
-		
-		# You can change template for specific render type:
-		$control->setFile(__DIR__ . '/path/to/bazFile.latte', 'baz'); # template for `renderBaz()`
-		
-		return $control;
-	}
+    # `$exception->rule` contains failed attribute
+    
+    $this->flashMessage('You don\'t have access here!', 'error');
+    $this->redirect('Homepage:');
+}
+```
+
+### Custom authorization attributes
+
+You can register your own attributes in the following way:
+
+```php
+use SixtyEightPublishers\SmartNetteComponent\Attribute\AttributeInterface;
+use SixtyEightPublishers\SmartNetteComponent\Authorization\RuleInterface;
+use SixtyEightPublishers\SmartNetteComponent\Authorization\RuleHandlerInterface;
+use SixtyEightPublishers\SmartNetteComponent\Exception\ForbiddenRequestException;
+
+final class CustomRule implements AttributeInterface, RuleInterface
+{
+    # ...
+}
+
+final class CustomRuleHandler implements RuleHandlerInterface
+{
+    public function canHandle(RuleInterface $rule): bool
+    {
+        return $rule instanceof CustomRule;
+    }
+
+    public function __invoke(RuleInterface $rule): void
+    {
+        assert($rule instanceof CustomRule);
+
+        if (...) {
+            throw new ForbiddenRequestException($rule);
+        }
+    }
+}
+```
+
+```neon
+services:
+    -
+        autowired: no
+        factory: CustomRuleHandler
+```
+
+## Template resolving
+
+You don't need to register any compiler extension to use this feature, just use the `TemplateResolverTrait` trait in your BaseControl.
+
+```php
+use Nette\Application\UI\Control;
+use SixtyEightPublishers\SmartNetteComponent\Bridge\Nette\Application\TemplateResolverTrait;
+
+abstract class BaseControl extends Control
+{
+    use TemplateResolverTrait;
+}
+```
+
+The base `render()` method is already declared in the trait.
+To assign variables to the template, we can use the `beforeRender()` method.
+You can also define custom `render*()` methods that are called for rendering using `{control myControl:foo}`.
+
+```php
+final class MyControl extends BaseControl
+{
+    protected function beforeRender(): void
+    {
+        # assign variables into the template here
+    }
+
+    public function renderFoo(): void
+    {
+        $this->doRender('foo');
+    }
+}
+```
+
+The template for the base render method will be resolved as `COMPONENT_DIRECTORY/templates/myControl.latte` or `COMPONENT_DIRECTORY/templates/MyControl.latte`.
+
+The template for the `foo` render method will be resolved as `COMPONENT_DIRECTORY/templates/foo.myControl.latte` or `COMPONENT_DIRECTORY/templates/foo.MyControl.latte`.
+
+Of course, you can set a template file manually:
+
+```php
+final class MyPresenter extends BasePresenter
+{
+    protected function createComponentMyControl() : FooControl
+    {
+        $control = $this->myControlFactory->create();
+
+        $control->setFile(__DIR__ . '/path/to/file.latte');
+        # or relatively from a component's directory:
+        $control->setRelativeFile('templates/new/myControl.latte');
+
+        # you can change the template for a specific render type:
+        $control->setFile(__DIR__ . '/path/to/myControl.latte', 'foo'); # template for `renderFoo()`
+
+        return $control;
+    }
 }
 ```
 
 ## Contributing
 
-Before committing any changes, don't forget to run
+Before opening a pull request, please check your changes using the following commands
 
 ```bash
-$ vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v --dry-run
-```
+$ make init # to pull and start all docker images
 
-and
-
-```bash
-$ vendor/bin/tester ./tests
+$ make cs.check
+$ make stan
+$ make tests.all
 ```
