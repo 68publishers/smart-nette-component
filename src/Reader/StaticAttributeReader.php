@@ -27,6 +27,11 @@ final class StaticAttributeReader implements AttributeReaderInterface
 		return $this->doFindAttributes($classname, $method, $stopBeforeParent);
 	}
 
+	/**
+	 * @param class-string $classname
+	 *
+	 * @return array<AttributeInfo>
+	 */
 	public function doFindAttributes(string $classname, ?string $method, ?string $stopBeforeParent): array
 	{
 		if (!array_key_exists($classname, $this->map->classHierarchy)) {

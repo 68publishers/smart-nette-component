@@ -11,11 +11,25 @@ use SixtyEightPublishers\SmartNetteComponent\TemplateResolver\TemplateFileResolv
 /**
  * For Controls only
  *
- * @method Template getTemplate
+ * @method Template getTemplate()
  */
 trait TemplateResolverTrait
 {
 	private ?ManualTemplateFileResolver $templateFileResolver = null;
+
+	public function setFile(string $file, string $type = ''): self
+	{
+		$this->getTemplateFileResolver()->setFile($file, $type);
+
+		return $this;
+	}
+
+	public function setRelativeFile(string $file, string $type = ''): self
+	{
+		$this->getTemplateFileResolver()->setRelativeFile($file, $type);
+
+		return $this;
+	}
 
 	public function render(): void
 	{
@@ -39,20 +53,6 @@ trait TemplateResolverTrait
 		$this->beforeRender();
 
 		return $this->getTemplate()->renderToString();
-	}
-
-	public function setFile(string $file, string $type = ''): self
-	{
-		$this->getTemplateFileResolver()->setFile($file, $type);
-
-		return $this;
-	}
-
-	public function setRelativeFile(string $file, string $type = ''): self
-	{
-		$this->getTemplateFileResolver()->setRelativeFile($file, $type);
-
-		return $this;
 	}
 
 	protected function getTemplateFileResolver(): ManualTemplateFileResolver

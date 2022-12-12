@@ -22,7 +22,7 @@ use function array_key_exists;
 final class AttributesMap
 {
 	/**
-	 * @param array<string, string|false>              $classHierarchy The key is classname, the value is the parent classname or false
+	 * @param array<class-string, class-string|false>  $classHierarchy The key is classname, the value is the parent classname or false
 	 * @param array<string, array<AttributeInterface>> $attributes     The key is class, the value is an array of attributes
 	 */
 	public function __construct(
@@ -32,6 +32,8 @@ final class AttributesMap
 	}
 
 	/**
+	 * @param array<class-string> $classList
+	 *
 	 * @throws ReflectionException
 	 */
 	public static function createFromClassList(array $classList, bool $useAttributePrototypes = false): self
@@ -107,6 +109,10 @@ final class AttributesMap
 		return $map;
 	}
 
+	/**
+	 * @param class-string       $classname
+	 * @param class-string|false $parentClassname
+	 */
 	public function withClass(string $classname, string|false $parentClassname): self
 	{
 		$classHierarchy = $this->classHierarchy;
@@ -116,6 +122,7 @@ final class AttributesMap
 	}
 
 	/**
+	 * @param class-string              $classname
 	 * @param array<AttributeInterface> $attributes
 	 */
 	public function withClassAttributes(string $classname, array $attributes): self
@@ -127,6 +134,7 @@ final class AttributesMap
 	}
 
 	/**
+	 * @param class-string              $classname
 	 * @param array<AttributeInterface> $attributes
 	 */
 	public function withMethodAttributes(string $classname, string $method, array $attributes): self
