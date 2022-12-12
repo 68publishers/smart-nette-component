@@ -7,10 +7,11 @@ namespace SixtyEightPublishers\SmartNetteComponent\TemplateResolver;
 use ReflectionClass;
 use function md5;
 use function trim;
-use function rtrim;
 use function is_dir;
 use function dirname;
 use function sprintf;
+use function realpath;
+use function file_exists;
 use function array_key_exists;
 
 final class TemplateFileResolverFactory
@@ -22,25 +23,32 @@ final class TemplateFileResolverFactory
 	/** @var array<string, AutomaticTemplateFileResolver> */
 	private static array $automaticCache = [];
 
-	public static function create(string $className, string $path): ManualTemplateFileResolver
+	/**
+	 * @param class-string $classname
+	 */
+	public static function create(string $classname, string $path): ManualTemplateFileResolver
 	{
-		$resolver = self::getAutomaticResolver($className, $path);
+		$resolver = self::getAutomaticResolver($classname, $path);
 
 		return new ManualTemplateFileResolver($resolver, $resolver->getMetadata());
 	}
 
 	/**
+	 * @param class-string $classname
+	 *
 	 * @noinspection PhpUnhandledExceptionInspection
+	 * @noinspection PhpDocMissingThrowsInspection
 	 */
-	private static function getAutomaticResolver(string $className, string $path): AutomaticTemplateFileResolver
+	private static function getAutomaticResolver(string $classname, string $path): AutomaticTemplateFileResolver
 	{
-		if (!array_key_exists($key = md5($className . '=' . $path), self::$automaticCache)) {
-			$reflection = new ReflectionClass($className);
+		if (!array_key_exists($key = md5($classname . '=' . $path), self::$automaticCache)) {
+			$reflection = new ReflectionClass($classname);
+			$realpath = realpath($path);
 
 			self::$automaticCache[$key] = new AutomaticTemplateFileResolver(new Metadata(
 				$reflection->getName(),
 				$reflection->getShortName(),
-				is_dir($path) ? sprintf('%s/', rtrim($path, '\\/')) : sprintf('%s/%s/', dirname($reflection->getFileName()), trim($path, '\\/'))
+				$realpath && file_exists($realpath) && is_dir($realpath) ? $realpath : sprintf('%s/%s', dirname((string) $reflection->getFileName()), trim($path, '\\/'))
 			));
 		}
 

@@ -42,6 +42,10 @@ final class AttributeReader implements AttributeReaderInterface
 	}
 
 	/**
+	 * @param class-string $classname
+	 *
+	 * @return array<AttributeInfo>
+	 *
 	 * @throws ReflectionException
 	 */
 	private function doFindAttributes(string $classname, ?string $method, ?string $stopBeforeParent): array

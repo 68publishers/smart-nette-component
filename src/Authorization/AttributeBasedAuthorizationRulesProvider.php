@@ -8,10 +8,12 @@ use InvalidArgumentException;
 use Nette\Application\IPresenter;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Presenter;
+use SixtyEightPublishers\SmartNetteComponent\Reader\AttributeInfo;
 use SixtyEightPublishers\SmartNetteComponent\Attribute\AttributeInterface;
 use SixtyEightPublishers\SmartNetteComponent\Reader\AttributeReaderInterface;
 use function sprintf;
 use function ucfirst;
+use function array_map;
 use function array_filter;
 use function array_values;
 use function is_subclass_of;
@@ -66,7 +68,7 @@ final class AttributeBasedAuthorizationRulesProvider implements AuthorizationRul
 	}
 
 	/**
-	 * @param array<AttributeInterface> $attributes
+	 * @param array<AttributeInfo> $attributes
 	 *
 	 * @return array<RuleInterface>
 	 */
@@ -74,7 +76,10 @@ final class AttributeBasedAuthorizationRulesProvider implements AuthorizationRul
 	{
 		return array_values(
 			array_filter(
-				$attributes,
+				array_map(
+					static fn (AttributeInfo $attributeInfo): AttributeInterface => $attributeInfo->attribute,
+					$attributes
+				),
 				static fn (AttributeInterface $attribute): bool => $attribute instanceof RuleInterface
 			)
 		);

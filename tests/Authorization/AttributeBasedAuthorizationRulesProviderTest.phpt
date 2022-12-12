@@ -10,6 +10,7 @@ use Tester\TestCase;
 use InvalidArgumentException;
 use Nette\Application\UI\Control;
 use Nette\Application\UI\Presenter;
+use SixtyEightPublishers\SmartNetteComponent\Reader\AttributeInfo;
 use SixtyEightPublishers\SmartNetteComponent\Tests\Fixtures\APresenter;
 use SixtyEightPublishers\SmartNetteComponent\Authorization\RuleInterface;
 use SixtyEightPublishers\SmartNetteComponent\Attribute\AttributeInterface;
@@ -60,10 +61,14 @@ final class AttributeBasedAuthorizationRulesProviderTest extends TestCase
 		$attribute2 = Mockery::mock(AttributeInterface::class);
 		$attribute3 = Mockery::mock(AttributeInterface::class, RuleInterface::class);
 
+		$attributeInfo1 = new AttributeInfo(APresenter::class, $attribute1);
+		$attributeInfo2 = new AttributeInfo(APresenter::class, $attribute2);
+		$attributeInfo3 = new AttributeInfo(APresenter::class, $attribute3);
+
 		$reader->shouldReceive('getClassAttributes')
 			->once()
 			->with(APresenter::class, Presenter::class)
-			->andReturn([$attribute1, $attribute2, $attribute3]);
+			->andReturn([$attributeInfo1, $attributeInfo2, $attributeInfo3]);
 
 		$provider = new AttributeBasedAuthorizationRulesProvider($reader);
 
@@ -77,10 +82,14 @@ final class AttributeBasedAuthorizationRulesProviderTest extends TestCase
 		$attribute2 = Mockery::mock(AttributeInterface::class);
 		$attribute3 = Mockery::mock(AttributeInterface::class, RuleInterface::class);
 
+		$attributeInfo1 = new AttributeInfo(APresenter::class, $attribute1);
+		$attributeInfo2 = new AttributeInfo(APresenter::class, $attribute2);
+		$attributeInfo3 = new AttributeInfo(APresenter::class, $attribute3);
+
 		$reader->shouldReceive('getMethodAttributes')
 			->once()
 			->with(APresenter::class, 'actionDefault', Presenter::class)
-			->andReturn([$attribute1, $attribute2, $attribute3]);
+			->andReturn([$attributeInfo1, $attributeInfo2, $attributeInfo3]);
 
 		$provider = new AttributeBasedAuthorizationRulesProvider($reader);
 
@@ -94,10 +103,14 @@ final class AttributeBasedAuthorizationRulesProviderTest extends TestCase
 		$attribute2 = Mockery::mock(AttributeInterface::class);
 		$attribute3 = Mockery::mock(AttributeInterface::class, RuleInterface::class);
 
+		$attributeInfo1 = new AttributeInfo(APresenter::class, $attribute1);
+		$attributeInfo2 = new AttributeInfo(APresenter::class, $attribute2);
+		$attributeInfo3 = new AttributeInfo(APresenter::class, $attribute3);
+
 		$reader->shouldReceive('getMethodAttributes')
 			->once()
 			->with(APresenter::class, 'handleFoo', Control::class)
-			->andReturn([$attribute1, $attribute2, $attribute3]);
+			->andReturn([$attributeInfo1, $attributeInfo2, $attributeInfo3]);
 
 		$provider = new AttributeBasedAuthorizationRulesProvider($reader);
 

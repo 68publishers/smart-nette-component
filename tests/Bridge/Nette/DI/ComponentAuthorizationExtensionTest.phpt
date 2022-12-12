@@ -11,6 +11,7 @@ use RuntimeException;
 use Nette\DI\Container;
 use NetteModule\ErrorPresenter;
 use NetteModule\MicroPresenter;
+use Tester\CodeCoverage\Collector;
 use SixtyEightPublishers\SmartNetteComponent\Attribute\InRole;
 use SixtyEightPublishers\SmartNetteComponent\Attribute\Allowed;
 use SixtyEightPublishers\SmartNetteComponent\Attribute\LoggedIn;
@@ -175,6 +176,14 @@ final class ComponentAuthorizationExtensionTest extends TestCase
 		assert($authorizator instanceof ComponentAuthorizator);
 
 		return $authorizator;
+	}
+
+	protected function tearDown(): void
+	{
+		# save manually partial code coverage to free memory
+		if (Collector::isStarted()) {
+			Collector::save();
+		}
 	}
 
 	private function assertHandlersShouldBeRegistered(ComponentAuthorizator $authorizator, array $customHandlers = []): void

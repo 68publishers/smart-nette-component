@@ -6,10 +6,13 @@ namespace SixtyEightPublishers\SmartNetteComponent\TemplateResolver;
 
 final class Metadata
 {
+	public readonly string $basePath;
+
 	public function __construct(
 		public readonly string $name,
 		public readonly string $shortName,
-		public readonly string $basePath
+		string $basePath
 	) {
+		$this->basePath = rtrim($basePath, DIRECTORY_SEPARATOR);
 	}
 }

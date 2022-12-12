@@ -21,12 +21,14 @@ use Nette\DI\Definitions\Definition;
 use Nette\DI\Definitions\FactoryDefinition;
 use Nette\DI\Definitions\ServiceDefinition;
 use SixtyEightPublishers\SmartNetteComponent\Reader\AttributesMap;
+use SixtyEightPublishers\SmartNetteComponent\Attribute\AttributeInterface;
 use SixtyEightPublishers\SmartNetteComponent\Attribute\AttributePrototype;
 use SixtyEightPublishers\SmartNetteComponent\Reader\StaticAttributeReader;
 use SixtyEightPublishers\SmartNetteComponent\Authorization\RuleHandlerInterface;
 use SixtyEightPublishers\SmartNetteComponent\Authorization\ComponentAuthorizatorAwareInterface;
 use function assert;
 use function dirname;
+use function fnmatch;
 use function is_file;
 use function sprintf;
 use function array_map;
@@ -35,6 +37,7 @@ use function array_merge;
 use function array_filter;
 use function array_unique;
 use function array_values;
+use function class_exists;
 use function sys_get_temp_dir;
 
 final class ComponentAuthorizationExtension extends CompilerExtension
@@ -100,7 +103,7 @@ final class ComponentAuthorizationExtension extends CompilerExtension
 		}
 
 		if ($config->scanDirs) {
-			if (!\class_exists(RobotLoader::class)) {
+			if (!class_exists(RobotLoader::class)) {
 				throw new RuntimeException(sprintf(
 					'RobotLoader is required to create cached attribute reader, install package "nette/robot-loader" or disable option %s: false.',
 					$this->prefix('scanDirs')
@@ -120,7 +123,7 @@ final class ComponentAuthorizationExtension extends CompilerExtension
 
 		if ($config->scanComposer) {
 			$classLoaderReflection = new ReflectionClass(ClassLoader::class);
-			$classFile = dirname($classLoaderReflection->getFileName()) . '/autoload_classmap.php';
+			$classFile = dirname((string) $classLoaderReflection->getFileName()) . '/autoload_classmap.php';
 
 			if (is_file($classFile)) {
 				$builder->addDependency($classFile);
@@ -131,6 +134,7 @@ final class ComponentAuthorizationExtension extends CompilerExtension
 		$classList = [];
 
 		foreach (array_unique($classes) as $class) {
+			$class = (string) $class;
 			$matched = false;
 
 			foreach ($config->scanFilters as $scanFilter) {
@@ -141,7 +145,7 @@ final class ComponentAuthorizationExtension extends CompilerExtension
 				}
 			}
 
-			if (!$matched || !\class_exists($class)) {
+			if (!$matched || !class_exists($class)) {
 				continue;
 			}
 
@@ -167,13 +171,24 @@ final class ComponentAuthorizationExtension extends CompilerExtension
 				'classHierarchy' => $map->classHierarchy,
 				'attributes' => array_map(
 					static fn (array $attrs): array => array_map(
-						static fn (AttributePrototype $prototype): Statement => new Statement($prototype->classname, $prototype->arguments),
+						static function (AttributeInterface $prototype): Statement {
+							assert($prototype instanceof AttributePrototype);
+
+							return new Statement($prototype->classname, $prototype->arguments);
+						},
 						$attrs
 					),
 					$map->attributes
 				),
 			]),
 		]);
+
+		/*
+		 * array_map(
+						static fn (AttributePrototype $prototype): Statement => new Statement($prototype->classname, $prototype->arguments),
+						$attrs
+					)
+		 */
 	}
 
 	private function registerRuleHandlers(): void
@@ -195,14 +210,19 @@ final class ComponentAuthorizationExtension extends CompilerExtension
 		$definitions = array_filter(
 			$this->getContainerBuilder()->getDefinitions(),
 			static fn (Definition $def): bool =>
-				is_a($def->getType(), ComponentAuthorizatorAwareInterface::class, true)
-				|| ($def instanceof FactoryDefinition && is_a($def->getResultType(), ComponentAuthorizatorAwareInterface::class, true))
+				null !== $def->getType()
+				 && (
+				 	is_a($def->getType(), ComponentAuthorizatorAwareInterface::class, true)
+				 	|| ($def instanceof FactoryDefinition && null !== $def->getResultType() && is_a($def->getResultType(), ComponentAuthorizatorAwareInterface::class, true))
+				 )
 		);
 
 		foreach ($definitions as $definition) {
 			if ($definition instanceof FactoryDefinition) {
 				$definition = $definition->getResultDefinition();
 			}
+
+			assert($definition instanceof ServiceDefinition);
 
 			$definition->addSetup('setComponentAuthorizator', [
 				new Reference($this->prefix('authorization.component_authorizator')),
