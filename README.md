@@ -18,6 +18,9 @@ The best way to install 68publishers/smart-nette-component is using Composer:
 $ composer require 68publishers/smart-nette-component
 ```
 
+The package requires PHP `^8.3` and `nette/application` `^3.1.0`.
+The option `scanDirs` of the compiler extension (with `cache: yes`) requires `nette/robot-loader` (`^3.4 || ^4.0`).
+
 ## Authorization attributes
 
 To use the authorization attributes, you need to register a compiler extension.
@@ -153,6 +156,10 @@ services:
         factory: CustomRuleHandler
 ```
 
+### Custom component authorizator
+
+If you replace the service `ComponentAuthorizatorInterface` with your own implementation, note that `checkAction()` receives the action name (e.g. `default` for `actionDefault()`) and `checkSignal()` receives the signal name (e.g. `delete` for `handleDelete()`), not the method names.
+
 ## Template resolving
 
 You don't need to register any compiler extension to use this feature, just use the `TemplateResolverTrait` trait in your BaseControl.
@@ -210,6 +217,16 @@ final class MyPresenter extends BasePresenter
     }
 }
 ```
+
+## Upgrade
+
+### 1.x → 2.0
+
+- The minimal PHP version is 8.3.
+- **Security fix:** in 1.x, the authorization attributes on action methods (`action<Action>()`) and signal methods (`handle<Signal>()`) were never enforced.
+  `AuthorizationTrait` passed the method name (e.g. `actionDefault`) to `ComponentAuthorizatorInterface::checkAction()`/`checkSignal()` and the rules provider looked up the method `actionActionDefault()`, which doesn't exist, so no rules were found.
+  Since 2.0 the rules are checked - review the attributes on your action and signal methods (and your rule handlers), requests that were allowed until now may be forbidden.
+- ❗ `AuthorizationTrait` passes the action name (`default`) and the signal name (`delete`) to `ComponentAuthorizatorInterface::checkAction()` and `checkSignal()` instead of the method names (`actionDefault`, `handleDelete`). Update your own `ComponentAuthorizatorInterface` implementations if you have any.
 
 ## Contributing
 

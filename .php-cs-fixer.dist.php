@@ -24,7 +24,7 @@ return (new PhpCsFixer\Config())
 			'statements' => ['break', 'continue', 'declare', 'return'],
 		],
 		'blank_line_after_namespace' => TRUE,
-		'single_blank_line_before_namespace' => TRUE,
+		'blank_lines_before_namespace' => TRUE,
 		'return_type_declaration' => [
 			'space_before' => 'none',
 		],

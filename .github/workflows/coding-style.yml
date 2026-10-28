@@ -10,18 +10,23 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
 jobs:
   php-cs-fixer:
     name: Php-Cs-Fixer
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: 8.3
           tools: composer:v2
 
       - name: Install dependencies
@@ -35,12 +40,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.1
+          php-version: 8.3
           tools: composer:v2
 
       - name: Install dependencies

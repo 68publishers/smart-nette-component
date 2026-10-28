@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace SixtyEightPublishers\SmartNetteComponent\Bridge\Nette\Application;
 
-use Nette\Application\UI\Template;
+use Nette\Bridges\ApplicationLatte\Template;
 use SixtyEightPublishers\SmartNetteComponent\TemplateResolver\ManualTemplateFileResolver;
 use SixtyEightPublishers\SmartNetteComponent\TemplateResolver\TemplateFileResolverFactory;
 

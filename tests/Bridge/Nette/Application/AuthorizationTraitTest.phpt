@@ -39,7 +39,7 @@ final class AuthorizationTraitTest extends TestCase
 
 		$componentAuthorizator->shouldReceive('checkAction')
 			->once()
-			->with(EPresenter::class, 'actionDefault')
+			->with(EPresenter::class, 'default')
 			->andReturns();
 
 		$presenter->setComponentAuthorizator($componentAuthorizator);
@@ -62,7 +62,7 @@ final class AuthorizationTraitTest extends TestCase
 
 		$componentAuthorizator->shouldReceive('checkAction')
 			->once()
-			->with(EPresenter::class, 'actionDefault')
+			->with(EPresenter::class, 'default')
 			->andThrows(new ForbiddenRequestException(new Allowed('resourceE', 'actionE')));
 
 		$presenter->setComponentAuthorizator($componentAuthorizator);
@@ -86,12 +86,12 @@ final class AuthorizationTraitTest extends TestCase
 
 		$componentAuthorizator->shouldReceive('checkAction')
 			->once()
-			->with(EPresenter::class, 'actionDefault')
+			->with(EPresenter::class, 'default')
 			->andReturns();
 
 		$componentAuthorizator->shouldReceive('checkSignal')
 			->once()
-			->with(EPresenter::class, 'handleSignalA')
+			->with(EPresenter::class, 'signalA')
 			->andReturns();
 
 		$presenter->setComponentAuthorizator($componentAuthorizator);
@@ -114,12 +114,12 @@ final class AuthorizationTraitTest extends TestCase
 
 		$componentAuthorizator->shouldReceive('checkAction')
 			->once()
-			->with(EPresenter::class, 'actionDefault')
+			->with(EPresenter::class, 'default')
 			->andReturns();
 
 		$componentAuthorizator->shouldReceive('checkSignal')
 			->once()
-			->with(EPresenter::class, 'handleSignalA')
+			->with(EPresenter::class, 'signalA')
 			->andThrows(new ForbiddenRequestException(new Allowed('resourceA', 'signalA')));
 
 		$presenter->setComponentAuthorizator($componentAuthorizator);
@@ -139,10 +139,11 @@ final class AuthorizationTraitTest extends TestCase
 
 		$componentAuthorizator->shouldReceive('checkSignal')
 			->once()
-			->with(BComponent::class, 'handleSignalA')
+			->with(BComponent::class, 'signalA')
 			->andReturns();
 
 		$component = $componentFactory->create();
+		$this->getPresenter('Tests:E')->addComponent($component, 'b'); # nette/application >= 3.2 requires an attached presenter
 
 		$component->setComponentAuthorizator($componentAuthorizator);
 		$component->signalReceived('signalA');
@@ -160,10 +161,11 @@ final class AuthorizationTraitTest extends TestCase
 
 		$componentAuthorizator->shouldReceive('checkSignal')
 			->once()
-			->with(BComponent::class, 'handleSignalA')
+			->with(BComponent::class, 'signalA')
 			->andThrows(new ForbiddenRequestException(new Allowed('resourceB', 'signalA')));
 
 		$component = $componentFactory->create();
+		$this->getPresenter('Tests:E')->addComponent($component, 'b'); # nette/application >= 3.2 requires an attached presenter
 
 		$component->setComponentAuthorizator($componentAuthorizator);
 

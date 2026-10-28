@@ -17,7 +17,6 @@ use Composer\Autoload\ClassLoader;
 use Nette\Application\UI\Presenter;
 use Nette\DI\Definitions\Reference;
 use Nette\DI\Definitions\Statement;
-use Nette\DI\Definitions\Definition;
 use Nette\DI\Definitions\FactoryDefinition;
 use Nette\DI\Definitions\ServiceDefinition;
 use SixtyEightPublishers\SmartNetteComponent\Reader\AttributesMap;
@@ -31,7 +30,9 @@ use function dirname;
 use function fnmatch;
 use function is_file;
 use function sprintf;
+use function is_array;
 use function array_map;
+use function is_string;
 use function array_keys;
 use function array_merge;
 use function array_filter;
@@ -67,7 +68,10 @@ final class ComponentAuthorizationExtension extends CompilerExtension
 
 	public function loadConfiguration(): void
 	{
-		$this->loadDefinitionsFromConfig($this->loadFromFile(__DIR__ . '/services.neon')['services']);
+		$services = $this->loadFromFile(__DIR__ . '/services.neon')['services'];
+		assert(is_array($services));
+
+		$this->loadDefinitionsFromConfig($services);
 	}
 
 	/**
@@ -110,12 +114,14 @@ final class ComponentAuthorizationExtension extends CompilerExtension
 				));
 			}
 
-			$tempDir = ($builder->parameters['tempDir'] ?? sys_get_temp_dir()) . '/cache/68publishers.smart-nette-components';
+			$tempDir = $builder->parameters['tempDir'] ?? sys_get_temp_dir();
+			assert(is_string($tempDir));
+
 			$loader = new RobotLoader();
-			$loader->acceptFiles = array_map(static fn (string $filter): string => $filter . '.php', $config->scanFilters);
+			$loader->acceptFiles = array_values(array_map(static fn (string $filter): string => $filter . '.php', $config->scanFilters));
 
 			$loader->addDirectory(...$config->scanDirs);
-			$loader->setTempDirectory($tempDir);
+			$loader->setTempDirectory($tempDir . '/cache/68publishers.smart-nette-components');
 			$loader->refresh();
 
 			$classes = array_keys($loader->getIndexedClasses());
@@ -199,7 +205,7 @@ final class ComponentAuthorizationExtension extends CompilerExtension
 
 		$handlers = array_filter(
 			$builder->findByType(RuleHandlerInterface::class),
-			static fn (Definition $definition): bool => $definition !== $handlerRegistry
+			static fn ($definition): bool => $definition !== $handlerRegistry
 		);
 
 		$handlerRegistry->setArgument('handlers', array_values($handlers));
@@ -209,11 +215,11 @@ final class ComponentAuthorizationExtension extends CompilerExtension
 	{
 		$definitions = array_filter(
 			$this->getContainerBuilder()->getDefinitions(),
-			static fn (Definition $def): bool =>
+			static fn ($def): bool =>
 				null !== $def->getType()
 				 && (
 				 	is_a($def->getType(), ComponentAuthorizatorAwareInterface::class, true)
-				 	|| ($def instanceof FactoryDefinition && null !== $def->getResultType() && is_a($def->getResultType(), ComponentAuthorizatorAwareInterface::class, true))
+					|| ($def instanceof FactoryDefinition && null !== $def->getResultType() && is_a($def->getResultType(), ComponentAuthorizatorAwareInterface::class, true))
 				 )
 		);
 

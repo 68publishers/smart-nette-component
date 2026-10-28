@@ -14,7 +14,7 @@ final class ForbiddenRequestException extends NetteForbiddenRequestException
 		public readonly RuleInterface $rule,
 		string $message = '',
 		int $httpCode = 0,
-		Throwable $previous = null
+		?Throwable $previous = null
 	) {
 		parent::__construct($message, $httpCode ?: $this->code, $previous);
 	}
