@@ -14,21 +14,25 @@
 		}
 	],
 	"require": {
-		"php": "^8.1",
+		"php": "^8.3",
 		"nette/application": "^3.1.0",
 		"nette/di": "^3.0.10",
-		"nette/security": "^3.1.4"
+		"nette/security": "^3.1.4",
+		"nette/utils": "^3.2 || ^4.0"
 	},
 	"require-dev": {
-		"friendsofphp/php-cs-fixer": "^3.13",
+		"friendsofphp/php-cs-fixer": "^3.89",
 		"latte/latte": "^2.5 || ^3.0",
-		"mockery/mockery": "^1.5",
+		"mockery/mockery": "^1.6.12",
 		"nette/bootstrap": "^3.1",
-		"nette/robot-loader": "^3.4",
-		"nette/tester": "^2.4.3",
-		"phpstan/phpstan": "^1.9",
-		"phpstan/phpstan-nette": "^1.1",
+		"nette/robot-loader": "^3.4 || ^4.0",
+		"nette/tester": "^2.6",
+		"phpstan/phpstan": "^2.1",
+		"phpstan/phpstan-nette": "^2.0",
 		"roave/security-advisories": "dev-latest"
+	},
+	"suggest": {
+		"nette/robot-loader": "Required for the option `cache: yes` with `scanDirs` of ComponentAuthorizationExtension."
 	},
 	"conflict": {
 		"nette/component-model": "<3.0.2"

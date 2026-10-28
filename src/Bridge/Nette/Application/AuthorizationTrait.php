@@ -8,6 +8,8 @@ use ReflectionClass;
 use ReflectionMethod;
 use SixtyEightPublishers\SmartNetteComponent\Exception\ForbiddenRequestException;
 use SixtyEightPublishers\SmartNetteComponent\Authorization\ComponentAuthorizatorAwareTrait;
+use function substr;
+use function lcfirst;
 use function str_starts_with;
 
 /**
@@ -34,14 +36,14 @@ trait AuthorizationTrait
 
 			# Process action authorization. Called in Component::tryCall()
 			if ($element instanceof ReflectionMethod && str_starts_with($element->getName(), 'action')) {
-				$this->componentAuthorizator->checkAction($element->getDeclaringClass()->getName(), $element->getName());
+				$this->componentAuthorizator->checkAction($element->getDeclaringClass()->getName(), lcfirst(substr($element->getName(), 6)));
 
 				return;
 			}
 
 			# Process signal authorization. Called in Component::tryCall()
 			if ($element instanceof ReflectionMethod && str_starts_with($element->getName(), 'handle')) {
-				$this->componentAuthorizator->checkSignal($element->getDeclaringClass()->getName(), $element->getName());
+				$this->componentAuthorizator->checkSignal($element->getDeclaringClass()->getName(), lcfirst(substr($element->getName(), 6)));
 			}
 		} catch (ForbiddenRequestException $e) {
 			$this->onForbiddenRequest($e);

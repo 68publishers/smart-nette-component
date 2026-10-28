@@ -1,3 +1,8 @@
 includes:
 	- vendor/phpstan/phpstan-nette/extension.neon
 	- vendor/phpstan/phpstan-nette/rules.neon
+
+parameters:
+	ignoreErrors:
+		# the traits are used by presenters and components of applications only (PHPStan 1 skipped them silently)
+		- identifier: trait.unused

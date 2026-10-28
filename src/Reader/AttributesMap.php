@@ -12,7 +12,6 @@ use Nette\Application\UI\Control;
 use Nette\Application\UI\Presenter;
 use SixtyEightPublishers\SmartNetteComponent\Attribute\AttributeInterface;
 use function count;
-use function assert;
 use function array_merge;
 use function array_filter;
 use function array_values;
@@ -86,7 +85,6 @@ final class AttributesMap
 				}
 
 				foreach ($methods as $method) {
-					assert($method instanceof ReflectionMethod);
 					$attributes = $reader->getMethodAttributes($reflection->getName(), $method->getName(), $reflection->getName());
 
 					if (0 < count($attributes)) {
