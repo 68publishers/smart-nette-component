@@ -18,7 +18,7 @@ The best way to install 68publishers/smart-nette-component is using Composer:
 $ composer require 68publishers/smart-nette-component
 ```
 
-The package requires PHP 8.3 or newer and `nette/application` 3.1+.
+The package requires PHP `^8.3` and `nette/application` `^3.1.0`.
 The option `scanDirs` of the compiler extension (with `cache: yes`) requires `nette/robot-loader` (`^3.4 || ^4.0`).
 
 ## Authorization attributes
